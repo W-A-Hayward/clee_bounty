@@ -1,12 +1,16 @@
 {
-  "name": "back",
+  "name": "clee-bounty-api",
+  "private": true,
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "type": "module",
+  "engines": {
+    "node": ">=24"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "scripts": {
+    "dev": "node --watch src/server.ts",
+    "start": "node src/server.ts",
+    "build": "../node_modules/.bin/tsc -p tsconfig.json",
+    "check": "../node_modules/.bin/tsc --noEmit -p tsconfig.json",
+    "serve": "node dist/server.js"
+  }
 }
