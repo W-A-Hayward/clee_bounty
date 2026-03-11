@@ -82,6 +82,43 @@ export type StudentMessage = {
   updatedAt: string
 }
 
+export type CompanyApplicant = {
+  id: string
+  projectSlug: string
+  projectTitle: string
+  companyName: string
+  status: 'submitted' | 'shortlisted' | 'interviewing' | 'accepted'
+  appliedLabel: string
+  note: string
+  studentName: string
+  studentSchool: string
+  studentProgram: string
+  studentPortfolio: string
+  studentRate: string
+  studentAvailability: string
+}
+
+export type CompanyMessageThread = {
+  id: string
+  company: string
+  projectSlug: string
+  preview: string
+  lastActive: string
+  unread: number
+  thread: string[]
+  studentName: string
+  studentEmail: string
+}
+
+export type StudentProfileUpdate = {
+  name?: string
+  school?: string
+  program?: string
+  portfolioUrl?: string
+  availability?: string
+  rate?: string
+}
+
 type StudentRecord = {
   id: string
   role: 'member'
@@ -331,6 +368,91 @@ export class FileStore {
 
   listMessagesForStudentEmail(email: string) {
     return this.listMessagesForStudent(this.requireStudentRecord(email).id)
+  }
+
+  listCompanyApplicants(companyEmail: string): CompanyApplicant[] {
+    const company = this.requireCompanyRecord(companyEmail)
+    const companySlugs = new Set(
+      this.data.companyProjects
+        .filter((p) => p.companyUserId === company.id && p.publicSlug)
+        .map((p) => p.publicSlug as string),
+    )
+
+    return this.data.applications
+      .filter((app) => companySlugs.has(app.projectSlug))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .map((app) => {
+        const student = this.data.students.find((s) => s.id === app.studentUserId)
+        return {
+          id: app.id,
+          projectSlug: app.projectSlug,
+          projectTitle: app.projectTitle,
+          companyName: app.companyName,
+          status: app.status,
+          appliedLabel: app.appliedLabel,
+          note: app.note,
+          studentName: student?.name ?? 'Unknown',
+          studentSchool: student?.school ?? '',
+          studentProgram: student?.program ?? '',
+          studentPortfolio: student?.portfolioUrl ?? '',
+          studentRate: student?.rate ?? '',
+          studentAvailability: student?.availability ?? '',
+        }
+      })
+  }
+
+  listCompanyMessages(companyEmail: string): CompanyMessageThread[] {
+    const company = this.requireCompanyRecord(companyEmail)
+    const companySlugs = new Set(
+      this.data.companyProjects
+        .filter((p) => p.companyUserId === company.id && p.publicSlug)
+        .map((p) => p.publicSlug as string),
+    )
+
+    return this.data.messages
+      .filter((msg) => companySlugs.has(msg.projectSlug))
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+      .map((msg) => {
+        const student = this.data.students.find((s) => s.id === msg.studentUserId)
+        return {
+          id: msg.id,
+          company: msg.company,
+          projectSlug: msg.projectSlug,
+          preview: msg.preview,
+          lastActive: msg.lastActive,
+          unread: msg.unread,
+          thread: msg.thread,
+          studentName: student?.name ?? 'Unknown',
+          studentEmail: student?.email ?? '',
+        }
+      })
+  }
+
+  updateStudentProfile(email: string, updates: StudentProfileUpdate): MemberSession {
+    const student = this.requireStudentRecord(email)
+    if (updates.name !== undefined) student.name = requireText(updates.name, 'Name')
+    if (updates.school !== undefined) student.school = requireText(updates.school, 'School')
+    if (updates.program !== undefined) student.program = requireText(updates.program, 'Program')
+    if (updates.portfolioUrl !== undefined) student.portfolioUrl = requireText(updates.portfolioUrl, 'Portfolio URL')
+    if (updates.availability !== undefined) student.availability = requireText(updates.availability, 'Availability')
+    if (updates.rate !== undefined) student.rate = requireText(updates.rate, 'Rate')
+    this.persist()
+    return sanitizeStudent(student)
+  }
+
+  addStudentMessageReply(messageId: string, studentEmail: string, text: string) {
+    const student = this.requireStudentRecord(studentEmail)
+    const message = this.data.messages.find(
+      (m) => m.id === messageId && m.studentUserId === student.id,
+    )
+    if (!message) throw new Error('Message thread not found.')
+    const replyText = requireText(text, 'Reply')
+    message.thread.push(`${student.name}: ${replyText}`)
+    message.preview = replyText.length > 80 ? `${replyText.slice(0, 80)}…` : replyText
+    message.lastActive = 'Just now'
+    message.unread = 0
+    message.updatedAt = new Date().toISOString()
+    this.persist()
   }
 
   createProject(company: CompanySession, draft: CompanyProjectDraft) {

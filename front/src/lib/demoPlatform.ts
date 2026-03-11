@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { companyProjects as publicCompanyHighlights, type CompanyProject } from '../data/companyPortal'
+import { type CompanyProject } from '../data/companyPortal'
 import {
   getProjectBySlug as getBaseProjectBySlug,
   studentProjects as baseStudentProjects,
@@ -11,11 +11,20 @@ import {
   applyToProject,
   createProject,
   fetchApplications,
+  fetchCompanyApplicants,
+  fetchCompanyMessages,
   fetchCompanyProjects,
   fetchMessages,
   fetchProjects,
+  replyToMessage,
+  updateProfile,
+  type ApiCompanyApplicant,
+  type ApiCompanyMessageThread,
+  type ProfileUpdate,
 } from './api'
 import type { CompanySession, DemoSession, MemberSession } from './demoSession'
+
+export type { ApiCompanyApplicant, ApiCompanyMessageThread, ProfileUpdate }
 
 export type DemoCompanyProject = CompanyProject & {
   publicSlug?: string
@@ -49,7 +58,9 @@ export function useDemoPlatform(session: DemoSession, authStatus: 'loading' | 'r
   const [remoteProjects, setRemoteProjects] = useState<StudentProject[]>([])
   const [applications, setApplications] = useState<StudentApplication[]>([])
   const [messages, setMessages] = useState<StudentMessage[]>([])
-  const [companyProjects, setCompanyProjects] = useState<DemoCompanyProject[]>([])
+  const [companyProjectsState, setCompanyProjects] = useState<DemoCompanyProject[]>([])
+  const [companyApplicants, setCompanyApplicants] = useState<ApiCompanyApplicant[]>([])
+  const [companyMessages, setCompanyMessages] = useState<ApiCompanyMessageThread[]>([])
 
   useEffect(() => {
     void loadPublicProjects()
@@ -64,6 +75,8 @@ export function useDemoPlatform(session: DemoSession, authStatus: 'loading' | 'r
       setApplications([])
       setMessages([])
       setCompanyProjects([])
+      setCompanyApplicants([])
+      setCompanyMessages([])
       return
     }
 
@@ -93,7 +106,7 @@ export function useDemoPlatform(session: DemoSession, authStatus: 'loading' | 'r
   const hasApplied = (projectSlug: string) =>
     applications.some((application) => application.projectSlug === projectSlug)
 
-  const getCompanyProjectsForSession = (_session: CompanySession) => companyProjects
+  const getCompanyProjectsForSession = (_session: CompanySession) => companyProjectsState
 
   const submitApplication = async (
     project: StudentProject,
@@ -127,9 +140,30 @@ export function useDemoPlatform(session: DemoSession, authStatus: 'loading' | 'r
     return result.project.slug
   }
 
+  const submitMessageReply = async (messageId: string, text: string): Promise<DemoApplicationResult> => {
+    try {
+      await replyToMessage(messageId, text)
+      await refreshStudentData()
+      return { ok: true, message: 'Reply sent.' }
+    } catch (error) {
+      return { ok: false, message: getErrorMessage(error) }
+    }
+  }
+
+  const updateStudentProfileRemote = async (updates: ProfileUpdate): Promise<DemoApplicationResult> => {
+    try {
+      await updateProfile(updates)
+      return { ok: true, message: 'Profile updated.' }
+    } catch (error) {
+      return { ok: false, message: getErrorMessage(error) }
+    }
+  }
+
   return {
     studentProjects,
-    companyProjects: publicCompanyHighlights,
+    companyProjects: companyProjectsState,
+    companyApplicants,
+    companyMessages,
     applicationsWithProjects,
     messagesWithProjects,
     getProjectBySlug,
@@ -137,6 +171,8 @@ export function useDemoPlatform(session: DemoSession, authStatus: 'loading' | 'r
     hasApplied,
     submitApplication,
     postCompanyProject,
+    submitMessageReply,
+    updateStudentProfileRemote,
   }
 
   async function loadPublicProjects() {
@@ -161,10 +197,18 @@ export function useDemoPlatform(session: DemoSession, authStatus: 'loading' | 'r
 
   async function refreshCompanyData() {
     try {
-      const result = await fetchCompanyProjects()
-      setCompanyProjects(result.projects)
+      const [projectResult, applicantResult, messageResult] = await Promise.all([
+        fetchCompanyProjects(),
+        fetchCompanyApplicants(),
+        fetchCompanyMessages(),
+      ])
+      setCompanyProjects(projectResult.projects)
+      setCompanyApplicants(applicantResult.applicants)
+      setCompanyMessages(messageResult.messages)
     } catch {
       setCompanyProjects([])
+      setCompanyApplicants([])
+      setCompanyMessages([])
     }
   }
 }

@@ -1,14 +1,38 @@
 import { useState } from 'react'
 import SectionHeading from '../components/SectionHeading'
 import type { StudentMessage, StudentProject } from '../data/studentPortal'
+import type { DemoApplicationResult } from '../lib/demoPlatform'
 
 type MessagesPageProps = {
   messages: Array<StudentMessage & { project?: StudentProject }>
+  onReply?: (messageId: string, text: string) => Promise<DemoApplicationResult>
 }
 
-function MessagesPage({ messages }: MessagesPageProps) {
+function MessagesPage({ messages, onReply }: MessagesPageProps) {
   const [activeMessageId, setActiveMessageId] = useState(messages[0]?.id ?? '')
   const activeMessage = messages.find((message) => message.id === activeMessageId) ?? messages[0]
+  const [replyText, setReplyText] = useState('')
+  const [localThreads, setLocalThreads] = useState<Record<string, string[]>>(
+    Object.fromEntries(messages.map((m) => [m.id, m.thread])),
+  )
+  const [sending, setSending] = useState(false)
+
+  const currentThread = localThreads[activeMessageId] ?? activeMessage?.thread ?? []
+
+  const handleSend = async () => {
+    if (!replyText.trim() || !activeMessageId) return
+    const text = replyText.trim()
+    setReplyText('')
+    setSending(true)
+    setLocalThreads((prev) => ({
+      ...prev,
+      [activeMessageId]: [...(prev[activeMessageId] ?? []), `You: ${text}`],
+    }))
+    if (onReply) {
+      await onReply(activeMessageId, text)
+    }
+    setSending(false)
+  }
 
   return (
     <>
@@ -52,12 +76,34 @@ function MessagesPage({ messages }: MessagesPageProps) {
               </div>
 
               <div className="thread-stack">
-                {activeMessage.thread.map((item) => (
-                  <article key={item} className="thread-bubble">
+                {currentThread.map((item, index) => (
+                  <article key={index} className="thread-bubble">
                     {item}
                   </article>
                 ))}
               </div>
+
+              {onReply && (
+                <div className="form-grid" style={{ marginTop: '0.5rem' }}>
+                  <label className="field-shell">
+                    <span className="mini-label">Reply</span>
+                    <textarea
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder={`Message ${activeMessage.company}…`}
+                      rows={3}
+                      value={replyText}
+                    />
+                  </label>
+                  <button
+                    className="button button-primary"
+                    disabled={!replyText.trim() || sending}
+                    onClick={() => void handleSend()}
+                    type="button"
+                  >
+                    {sending ? 'Sending…' : 'Send reply'}
+                  </button>
+                </div>
+              )}
             </>
           ) : null}
         </article>

@@ -1,148 +1,31 @@
 import { useState } from 'react'
 import SectionHeading from '../components/SectionHeading'
-import type { DemoCompanyProject } from '../lib/demoPlatform'
+import type { ApiCompanyApplicant, DemoCompanyProject } from '../lib/demoPlatform'
 import { routeHref } from '../lib/hashRouter'
 
-type CompanyApplicant = {
-  id: string
-  projectId: string
-  name: string
-  school: string
-  program: string
-  rate: string
-  availability: string
-  fit: string
-  status: 'submitted' | 'shortlisted' | 'interviewing' | 'accepted' | 'declined'
-  appliedLabel: string
-  note: string
-}
-
-const mockApplicants: CompanyApplicant[] = [
-  {
-    id: 'ap-1',
-    projectId: 'co-1',
-    name: 'Amira Khan',
-    school: 'Concordia University',
-    program: 'BCompSc, Product + Frontend',
-    rate: '$28/hr',
-    availability: '12h/week',
-    fit: '94%',
-    status: 'shortlisted',
-    appliedLabel: 'Applied Mar 5',
-    note: 'Strong UI portfolio with clear design-system thinking. Product mindset visible throughout.',
-  },
-  {
-    id: 'ap-2',
-    projectId: 'co-1',
-    name: 'Jordan Lee',
-    school: 'McGill University',
-    program: 'BSc Computer Science',
-    rate: '$25/hr',
-    availability: '15h/week',
-    fit: '87%',
-    status: 'submitted',
-    appliedLabel: 'Applied Mar 6',
-    note: 'Good component work. Needs to share more system-level examples before shortlist.',
-  },
-  {
-    id: 'ap-3',
-    projectId: 'co-1',
-    name: 'Sofia Perez',
-    school: 'Polytechnique Montréal',
-    program: 'Software Engineering',
-    rate: '$30/hr',
-    availability: '10h/week',
-    fit: '82%',
-    status: 'submitted',
-    appliedLabel: 'Applied Mar 7',
-    note: 'Strong design-and-dev background. Availability might be tight for a 3-week sprint.',
-  },
-  {
-    id: 'ap-4',
-    projectId: 'co-2',
-    name: 'Miles Chen',
-    school: 'HEC Montréal',
-    program: 'MSc Management Analytics',
-    rate: '$26/hr',
-    availability: '20h/week',
-    fit: '89%',
-    status: 'interviewing',
-    appliedLabel: 'Applied Mar 2',
-    note: 'Excellent analytics storytelling and strong availability. Already at the interview stage.',
-  },
-  {
-    id: 'ap-5',
-    projectId: 'co-2',
-    name: 'Priya Sharma',
-    school: 'University of Waterloo',
-    program: 'Data Science + Statistics',
-    rate: '$24/hr',
-    availability: '18h/week',
-    fit: '85%',
-    status: 'shortlisted',
-    appliedLabel: 'Applied Mar 3',
-    note: 'Strong SQL portfolio and clear reporting structure in previous projects.',
-  },
-  {
-    id: 'ap-6',
-    projectId: 'co-3',
-    name: 'Noor Haddad',
-    school: 'UQAM',
-    program: 'BDes, UX and Frontend',
-    rate: '$29/hr',
-    availability: '12h/week',
-    fit: '86%',
-    status: 'accepted',
-    appliedLabel: 'Applied Feb 28',
-    note: 'Accessibility-focused portfolio and solid QA depth. Accepted and now in kickoff.',
-  },
-  {
-    id: 'ap-7',
-    projectId: 'co-1',
-    name: 'Kai Tanaka',
-    school: 'UDEM',
-    program: 'Interactive Media Design',
-    rate: '$27/hr',
-    availability: '16h/week',
-    fit: '79%',
-    status: 'submitted',
-    appliedLabel: 'Applied Mar 8',
-    note: 'Good visual instincts. Less experience with structured component systems.',
-  },
-]
-
-const statusToneMap: Record<CompanyApplicant['status'], string> = {
+const statusToneMap: Record<ApiCompanyApplicant['status'], string> = {
   submitted: 'status-submitted',
   shortlisted: 'status-shortlisted',
   interviewing: 'status-interviewing',
   accepted: 'status-match',
-  declined: 'status-draft',
 }
 
 type CompanyApplicantsPageProps = {
   projects: DemoCompanyProject[]
+  applicants: ApiCompanyApplicant[]
 }
 
-function CompanyApplicantsPage({ projects }: CompanyApplicantsPageProps) {
-  const [activeProjectId, setActiveProjectId] = useState<string>('all')
-
-  const projectOptions = projects.length > 0 ? projects : [
-    { id: 'co-1', title: 'Frontend redesign sprint for a fintech dashboard', status: 'open', applicants: 32, shortlisted: 8, budget: '$3.2k - $4.8k', workMode: 'Remote', projectType: 'Freelance sprint', experienceLevel: 'Intermediate', deadlineLabel: 'Deadline Mar 21', owner: 'Leah Martin', summary: '', requiredSkills: [], nextStep: '', tone: 'tone-blue' as const },
-    { id: 'co-2', title: 'Growth analytics board for student ambassador campaigns', status: 'in_review', applicants: 24, shortlisted: 5, budget: '$1.6k - $2.4k', workMode: 'Hybrid', projectType: 'Analytics engagement', experienceLevel: 'Intermediate', deadlineLabel: 'Deadline Mar 18', owner: 'Miles Chen', summary: '', requiredSkills: [], nextStep: '', tone: 'tone-green' as const },
-    { id: 'co-3', title: 'Accessibility polish for a healthcare onboarding flow', status: 'matched', applicants: 19, shortlisted: 3, budget: '$3.4k - $4.8k', workMode: 'Remote', projectType: 'Frontend audit + patch sprint', experienceLevel: 'Advanced', deadlineLabel: 'Matched Mar 7', owner: 'Noor Haddad', summary: '', requiredSkills: [], nextStep: '', tone: 'tone-orange' as const },
-  ]
+function CompanyApplicantsPage({ projects, applicants }: CompanyApplicantsPageProps) {
+  const [activeSlug, setActiveSlug] = useState<string>('all')
 
   const filteredApplicants =
-    activeProjectId === 'all'
-      ? mockApplicants
-      : mockApplicants.filter((a) => a.projectId === activeProjectId)
+    activeSlug === 'all'
+      ? applicants
+      : applicants.filter((a) => a.projectSlug === activeSlug)
 
-  const totalApplicants = mockApplicants.length
-  const shortlisted = mockApplicants.filter((a) => a.status === 'shortlisted' || a.status === 'interviewing' || a.status === 'accepted').length
-  const needsReview = mockApplicants.filter((a) => a.status === 'submitted').length
-
-  const getProjectTitle = (projectId: string) =>
-    projectOptions.find((p) => p.id === projectId)?.title ?? 'Unknown project'
+  const totalApplicants = applicants.length
+  const shortlisted = applicants.filter((a) => a.status === 'shortlisted' || a.status === 'interviewing' || a.status === 'accepted').length
+  const needsReview = applicants.filter((a) => a.status === 'submitted').length
 
   return (
     <>
@@ -178,27 +61,29 @@ function CompanyApplicantsPage({ projects }: CompanyApplicantsPageProps) {
         </div>
       </section>
 
-      <section className="section-block portal-section-tight">
-        <div className="filter-row">
-          <button
-            className={`filter-chip${activeProjectId === 'all' ? ' is-active' : ''}`}
-            onClick={() => setActiveProjectId('all')}
-            type="button"
-          >
-            All projects
-          </button>
-          {projectOptions.map((project) => (
+      {projects.length > 0 && (
+        <section className="section-block portal-section-tight">
+          <div className="filter-row">
             <button
-              key={project.id}
-              className={`filter-chip${activeProjectId === project.id ? ' is-active' : ''}`}
-              onClick={() => setActiveProjectId(project.id)}
+              className={`filter-chip${activeSlug === 'all' ? ' is-active' : ''}`}
+              onClick={() => setActiveSlug('all')}
               type="button"
             >
-              {project.title.split(' ').slice(0, 4).join(' ')}…
+              All projects
             </button>
-          ))}
-        </div>
-      </section>
+            {projects.map((project) => (
+              <button
+                key={project.id}
+                className={`filter-chip${activeSlug === (project.publicSlug ?? project.id) ? ' is-active' : ''}`}
+                onClick={() => setActiveSlug(project.publicSlug ?? project.id)}
+                type="button"
+              >
+                {project.title.split(' ').slice(0, 4).join(' ')}…
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section-block">
         {filteredApplicants.length > 0 ? (
@@ -207,8 +92,8 @@ function CompanyApplicantsPage({ projects }: CompanyApplicantsPageProps) {
               <article key={applicant.id} className="panel-card">
                 <div className="project-card-topline">
                   <div>
-                    <span className="card-kicker">{getProjectTitle(applicant.projectId).split(' ').slice(0, 6).join(' ')}…</span>
-                    <h3 style={{ margin: '0.35rem 0 0', fontSize: '1.25rem' }}>{applicant.name}</h3>
+                    <span className="card-kicker">{applicant.projectTitle.split(' ').slice(0, 6).join(' ')}…</span>
+                    <h3 style={{ margin: '0.35rem 0 0', fontSize: '1.25rem' }}>{applicant.studentName}</h3>
                   </div>
                   <div className="status-column">
                     <span className={`status-pill ${statusToneMap[applicant.status]}`}>{applicant.status}</span>
@@ -217,19 +102,13 @@ function CompanyApplicantsPage({ projects }: CompanyApplicantsPageProps) {
                 </div>
 
                 <div className="project-card-meta">
-                  <span>{applicant.school}</span>
-                  <span>{applicant.program}</span>
-                  <span>{applicant.rate}</span>
-                  <span>{applicant.availability}</span>
+                  <span>{applicant.studentSchool}</span>
+                  <span>{applicant.studentProgram}</span>
+                  <span>{applicant.studentRate}</span>
+                  <span>{applicant.studentAvailability}</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: '1rem', alignItems: 'end' }}>
-                  <p style={{ margin: 0, color: 'var(--ink-soft)' }}>{applicant.note}</p>
-                  <article className="project-card-fit">
-                    <strong>{applicant.fit}</strong>
-                    <small>fit score</small>
-                  </article>
-                </div>
+                <p style={{ margin: '0.5rem 0 0', color: 'var(--ink-soft)' }}>{applicant.note}</p>
 
                 <div className="hero-actions">
                   {applicant.status === 'submitted' && (
@@ -312,9 +191,10 @@ function CompanyApplicantsPage({ projects }: CompanyApplicantsPageProps) {
           />
 
           <div className="list-stack">
-            {projectOptions.map((project) => {
-              const count = mockApplicants.filter((a) => a.projectId === project.id).length
-              const pending = mockApplicants.filter((a) => a.projectId === project.id && a.status === 'submitted').length
+            {projects.map((project) => {
+              const slug = project.publicSlug ?? project.id
+              const count = applicants.filter((a) => a.projectSlug === slug).length
+              const pending = applicants.filter((a) => a.projectSlug === slug && a.status === 'submitted').length
 
               return (
                 <article key={project.id} className={`list-card ${project.tone}`}>

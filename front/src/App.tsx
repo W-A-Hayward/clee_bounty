@@ -36,6 +36,8 @@ function App() {
   const {
     studentProjects,
     companyProjects,
+    companyApplicants,
+    companyMessages,
     applicationsWithProjects,
     messagesWithProjects,
     getProjectBySlug,
@@ -43,6 +45,8 @@ function App() {
     hasApplied,
     submitApplication,
     postCompanyProject,
+    submitMessageReply,
+    updateStudentProfileRemote,
   } = useDemoPlatform(session, status)
   const [memberAuthTarget, setMemberAuthTarget] = useState('/dashboard')
   const [companyAuthTarget, setCompanyAuthTarget] = useState('/company/dashboard')
@@ -342,7 +346,7 @@ function App() {
           subtitle="Keep project-linked conversations inside the platform instead of scattering them across email."
           title="Messages"
         >
-          <MessagesPage messages={messagesWithProjects} />
+          <MessagesPage messages={messagesWithProjects} onReply={submitMessageReply} />
         </WorkspaceLayout>
       )
     }
@@ -356,7 +360,7 @@ function App() {
           subtitle="Your profile is visible to verified companies when you apply. Keep it accurate to improve match quality."
           title="Your profile"
         >
-          <StudentProfilePage session={memberSession} />
+          <StudentProfilePage onSave={updateStudentProfileRemote} session={memberSession} />
         </WorkspaceLayout>
       )
     }
@@ -425,7 +429,7 @@ function App() {
           subtitle="Review every candidate in one queue. Filter by project and move them through your pipeline."
           title="Applicants"
         >
-          <CompanyApplicantsPage projects={visibleCompanyProjects} />
+          <CompanyApplicantsPage applicants={companyApplicants} projects={visibleCompanyProjects} />
         </CompanyLayout>
       )
     }
@@ -439,7 +443,7 @@ function App() {
           subtitle="Reply to candidates, share project context, and keep all hiring conversations inside the platform."
           title="Messages"
         >
-          <CompanyMessagesPage projects={visibleCompanyProjects} session={companySession} />
+          <CompanyMessagesPage messages={companyMessages} projects={visibleCompanyProjects} session={companySession} />
         </CompanyLayout>
       )
     }

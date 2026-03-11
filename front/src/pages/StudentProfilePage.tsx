@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import SectionHeading from '../components/SectionHeading'
+import type { DemoApplicationResult, ProfileUpdate } from '../lib/demoPlatform'
 import type { MemberSession } from '../lib/demoSession'
 import { routeHref } from '../lib/hashRouter'
 
 type StudentProfilePageProps = {
   session: MemberSession
+  onSave?: (updates: ProfileUpdate) => Promise<DemoApplicationResult>
 }
 
 const skillOptions = [
@@ -13,13 +15,8 @@ const skillOptions = [
   'QA', 'Presentation', 'Copy', 'CSS', 'Next.js',
 ]
 
-const portfolioLinks = [
-  { label: 'Portfolio', placeholder: 'amira.design', key: 'portfolio' as const },
-  { label: 'GitHub', placeholder: 'github.com/amira', key: 'github' as const },
-  { label: 'LinkedIn', placeholder: 'linkedin.com/in/amira', key: 'linkedin' as const },
-]
 
-function StudentProfilePage({ session }: StudentProfilePageProps) {
+function StudentProfilePage({ session, onSave }: StudentProfilePageProps) {
   const [name, setName] = useState(session.name)
   const [program, setProgram] = useState(session.program)
   const [school, setSchool] = useState(session.school)
@@ -41,8 +38,11 @@ function StudentProfilePage({ session }: StudentProfilePageProps) {
     )
   }
 
-  const handleSave = (event: React.FormEvent) => {
+  const handleSave = async (event: React.FormEvent) => {
     event.preventDefault()
+    if (onSave) {
+      await onSave({ name, school, program, portfolioUrl: portfolio, availability, rate })
+    }
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }

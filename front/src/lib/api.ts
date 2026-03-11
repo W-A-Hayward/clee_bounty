@@ -15,6 +15,43 @@ export class ApiError extends Error {
   }
 }
 
+export type ApiCompanyApplicant = {
+  id: string
+  projectSlug: string
+  projectTitle: string
+  companyName: string
+  status: 'submitted' | 'shortlisted' | 'interviewing' | 'accepted'
+  appliedLabel: string
+  note: string
+  studentName: string
+  studentSchool: string
+  studentProgram: string
+  studentPortfolio: string
+  studentRate: string
+  studentAvailability: string
+}
+
+export type ApiCompanyMessageThread = {
+  id: string
+  company: string
+  projectSlug: string
+  preview: string
+  lastActive: string
+  unread: number
+  thread: string[]
+  studentName: string
+  studentEmail: string
+}
+
+export type ProfileUpdate = {
+  name?: string
+  school?: string
+  program?: string
+  portfolioUrl?: string
+  availability?: string
+  rate?: string
+}
+
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
 
 export async function fetchSession() {
@@ -71,6 +108,14 @@ export async function fetchCompanyProjects() {
   return request<{ ok: true; projects: DemoCompanyProject[] }>('/api/company/projects')
 }
 
+export async function fetchCompanyApplicants() {
+  return request<{ ok: true; applicants: ApiCompanyApplicant[] }>('/api/company/applicants')
+}
+
+export async function fetchCompanyMessages() {
+  return request<{ ok: true; messages: ApiCompanyMessageThread[] }>('/api/company/messages')
+}
+
 export async function createProject(draft: CompanyProjectDraft) {
   return request<{ ok: true; project: StudentProject }>('/api/projects', {
     body: draft,
@@ -92,10 +137,24 @@ export async function applyToProject(
   })
 }
 
+export async function updateProfile(updates: ProfileUpdate) {
+  return request<{ ok: true; session: MemberSession }>('/api/profile', {
+    body: updates as Record<string, unknown>,
+    method: 'PATCH',
+  })
+}
+
+export async function replyToMessage(messageId: string, text: string) {
+  return request<{ ok: true }>(`/api/messages/${messageId}/reply`, {
+    body: { text },
+    method: 'POST',
+  })
+}
+
 async function request<T>(
   path: string,
   options: {
-    method?: 'GET' | 'POST'
+    method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
     body?: JsonRequestBody
   } = {},
 ): Promise<T> {
