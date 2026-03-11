@@ -1,3 +1,10 @@
+// TODO: Fix server.ts - handleRequest import
+// Steps needed:
+// 1. Ensure app.ts exports handleRequest function (see app.ts TODO)
+// 2. Alternatively, import app directly and use app(request, response) instead
+// 3. Consider adding graceful shutdown for database connections (Prisma disconnect)
+// 4. Consider adding health check endpoint before starting server
+
 import { createServer } from 'node:http'
 import { env } from './config/env.ts'
 import { handleRequest } from './app.ts'
