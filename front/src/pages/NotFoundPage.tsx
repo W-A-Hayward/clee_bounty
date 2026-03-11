@@ -9,7 +9,7 @@ const suggestions = [
   },
   {
     title: 'Student workspace',
-    body: 'Dashboard, applications, messages, and your profile — everything in one place.',
+    body: 'Dashboard, applications, messages, and your profile — all in one place.',
     href: '/dashboard',
     tone: 'tone-green' as const,
   },
@@ -30,37 +30,29 @@ const suggestions = [
 function NotFoundPage() {
   return (
     <>
-      {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="page-header split-header">
-        <div>
-          <p className="eyebrow">404 — Not found</p>
-          <h1>This page does not exist.</h1>
-          <p className="page-intro">
-            The route you followed is not mapped. It may have moved, never existed, or the link
-            was typed incorrectly. The rest of the platform is working fine.
+      <section className="section-block" style={{ paddingBottom: 0 }}>
+        <div style={{ maxWidth: '38rem' }}>
+          <p className="eyebrow">404 — Page not found</p>
+          <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', lineHeight: 1.2, margin: '0.5rem 0 1rem' }}>
+            This page doesn't exist.
+          </h1>
+          <p className="page-intro" style={{ margin: 0 }}>
+            The route you followed isn't mapped — it may have moved, never existed, or the link was typed incorrectly. The rest of the platform is working fine.
           </p>
         </div>
 
-        <article className="info-card tone-red">
-          <span className="mini-label">Let us get you back on track</span>
-          <strong>Start from a known location.</strong>
-          <p>
-            The homepage, project board, and your workspace are all one click away. Use the links
-            below or pick from the suggestions further down.
-          </p>
-          <div className="hero-actions">
-            <a className="button button-primary" href={routeHref('/')}>
-              Back to homepage
-            </a>
-            <a className="button button-secondary" href={routeHref('/projects')}>
-              Browse projects
-            </a>
-          </div>
-        </article>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+          <a className="button button-primary" href={routeHref('/')}>
+            Back to homepage
+          </a>
+          <a className="button button-secondary" href={routeHref('/projects')}>
+            Browse projects
+          </a>
+        </div>
       </section>
 
-      {/* ── SUGGESTIONS ──────────────────────────────────────────── */}
       <section className="section-block">
+        <p className="eyebrow" style={{ marginBottom: '1rem' }}>Where would you like to go?</p>
         <div className="feature-grid feature-grid-two">
           {suggestions.map((s) => (
             <a key={s.title} className={`feature-card ${s.tone}`} href={routeHref(s.href)}>
@@ -71,15 +63,13 @@ function NotFoundPage() {
         </div>
       </section>
 
-      {/* ── BOTTOM CTA ───────────────────────────────────────────── */}
       <section className="section-block">
         <div className="cta-panel-full">
           <div>
-            <p className="eyebrow">Still lost?</p>
-            <h2>Sign in and go straight to your workspace.</h2>
+            <p className="eyebrow">Need your workspace?</p>
+            <h2>Sign in and go straight to the right place.</h2>
             <p>
-              If you were trying to reach a page that requires an account, sign in first and the
-              platform will route you to the right place automatically.
+              If you were trying to reach a page that requires an account, sign in first and the platform will route you automatically.
             </p>
           </div>
           <div className="cta-panel-actions">

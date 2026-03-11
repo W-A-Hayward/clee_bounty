@@ -8,17 +8,17 @@ type CompanyProjectsPageProps = {
 }
 
 function CompanyProjectsPage({ projects }: CompanyProjectsPageProps) {
-  const openProjects = projects.filter((project) => project.status === 'open').length
-  const reviewProjects = projects.filter((project) => project.status === 'in_review').length
-  const totalApplicants = projects.reduce((sum, project) => sum + project.applicants, 0)
+  const openProjects = projects.filter((p) => p.status === 'open').length
+  const reviewProjects = projects.filter((p) => p.status === 'in_review').length
+  const totalApplicants = projects.reduce((sum, p) => sum + p.applicants, 0)
 
   return (
     <>
       <section className="section-block portal-section-tight">
         <SectionHeading
           eyebrow="Company projects"
-          title="Manage the roles your company has published on the website."
-          description="This company-side view tracks live project inventory, status, and applicant volume."
+          title="All your posted briefs in one place."
+          description="Track live projects, applicant volume, and next steps across everything your company has published."
         />
 
         <div className="metrics-grid">
@@ -26,21 +26,21 @@ function CompanyProjectsPage({ projects }: CompanyProjectsPageProps) {
             <strong>{projects.length}</strong>
             <div>
               <span>total briefs</span>
-              <p>Published, reviewing, matched, or still in draft internally.</p>
+              <p>Published, in review, matched, or in progress.</p>
             </div>
           </article>
           <article className="metric-card tone-green">
             <strong>{openProjects + reviewProjects}</strong>
             <div>
               <span>active review</span>
-              <p>Projects still receiving or triaging applicants.</p>
+              <p>Still accepting or triaging applicants right now.</p>
             </div>
           </article>
           <article className="metric-card tone-orange">
             <strong>{totalApplicants}</strong>
             <div>
               <span>applicant volume</span>
-              <p>Candidate demand is visible across the whole company pipeline.</p>
+              <p>Total candidates across all your live projects.</p>
             </div>
           </article>
         </div>
@@ -55,7 +55,7 @@ function CompanyProjectsPage({ projects }: CompanyProjectsPageProps) {
                   <span className="card-kicker">
                     {project.projectType} / {project.workMode}
                   </span>
-                  <span className={`status-pill status-${project.status}`}>{project.status}</span>
+                  <span className={`status-pill status-${project.status}`}>{project.status.replace('_', ' ')}</span>
                 </div>
 
                 <h3>{project.title}</h3>
@@ -82,21 +82,29 @@ function CompanyProjectsPage({ projects }: CompanyProjectsPageProps) {
                     <p>{project.nextStep}</p>
                   </div>
 
-                  {project.publicSlug ? (
-                    <a className="button button-secondary" href={routeHref(`/projects/${project.publicSlug}`)}>
-                      View public brief
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <a className="button button-secondary" href={routeHref('/company/applicants')}>
+                      Review applicants
                     </a>
-                  ) : null}
+                    {project.publicSlug ? (
+                      <a className="button button-ghost" href={routeHref(`/projects/${project.publicSlug}`)}>
+                        Public brief
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <article className="panel-card">
-            <h2>No projects posted yet.</h2>
-            <p>Publish the first scoped brief to make the company workspace feel real.</p>
+          <article className="panel-card" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
+            <p className="eyebrow">No projects yet</p>
+            <h2 style={{ margin: '0.5rem 0 0.75rem' }}>Ready to post your first brief?</h2>
+            <p style={{ color: 'var(--ink-soft)', maxWidth: '28rem', margin: '0 auto 1.5rem' }}>
+              Fill in scope, budget, timeline, and required skills. Students will be able to apply as soon as you publish.
+            </p>
             <a className="button button-primary" href={routeHref('/company/post-project')}>
-              Post your first project
+              Post your first project →
             </a>
           </article>
         )}
@@ -105,9 +113,9 @@ function CompanyProjectsPage({ projects }: CompanyProjectsPageProps) {
       <section className="section-block portal-two-column">
         <article className="panel-card">
           <SectionHeading
-            eyebrow="Before publishing"
-            title="Project quality stays consistent when the team uses one checklist."
-            description="This is the operational layer behind a trustworthy company workspace."
+            eyebrow="Before you publish"
+            title="A brief that reads well gets better applicants."
+            description="Make sure every field is filled in before making a project live on the board."
           />
 
           <ul className="point-list">
@@ -119,13 +127,13 @@ function CompanyProjectsPage({ projects }: CompanyProjectsPageProps) {
 
         <article className="panel-card">
           <SectionHeading
-            eyebrow="Next action"
-            title="Open a new brief when the current scope is clear enough."
-            description="The posting page gives companies more structure for drafting a usable opportunity."
+            eyebrow="Post a new brief"
+            title="Got a new project ready?"
+            description="Use the posting form to draft a structured brief with all the context students need."
           />
 
           <a className="button button-primary" href={routeHref('/company/post-project')}>
-            Post another project
+            Post a project →
           </a>
         </article>
       </section>

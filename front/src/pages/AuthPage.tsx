@@ -1,4 +1,3 @@
-import SectionHeading from '../components/SectionHeading'
 import type { DemoSession } from '../lib/demoSession'
 import { routeHref } from '../lib/hashRouter'
 
@@ -8,144 +7,114 @@ type AuthPageProps = {
 
 function AuthPage({ session = null }: AuthPageProps) {
   const workspaceRoute = session?.role === 'company' ? '/company/dashboard' : '/dashboard'
-  const workspaceLabel =
-    session?.role === 'company' ? 'Open company dashboard' : 'Open student dashboard'
+  const workspaceLabel = session?.role === 'company' ? 'Open company dashboard' : 'Open student dashboard'
 
   return (
     <>
-      {/* ── PAGE HEADER ──────────────────────────────────────────── */}
-      <section className="page-header split-header">
-        <div>
+      <section className="section-block" style={{ paddingBottom: 0 }}>
+        <div style={{ maxWidth: '38rem' }}>
           <p className="eyebrow">Account access</p>
-          <h1>Your work starts here.</h1>
-          <p className="page-intro">
-            Browse projects as a guest or sign in to unlock your full workspace. Students apply and
-            deliver. Companies post, review, and hire. Both sides get a clean dedicated path.
+          <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', lineHeight: 1.2, margin: '0.5rem 0 1rem' }}>
+            {session ? `Welcome back, ${session.role === 'company' ? (session as { companyName: string }).companyName : (session as { name: string }).name}.` : 'Sign in or create an account.'}
+          </h1>
+          <p className="page-intro" style={{ margin: 0 }}>
+            {session
+              ? 'Your workspace is ready. Head to your dashboard to manage projects, applications, and messages.'
+              : 'Choose your path — student or company. Both have a dedicated workspace once you are inside.'}
           </p>
         </div>
 
-        <article className="info-card tone-blue">
-          <span className="mini-label">
-            {session ? 'Already signed in' : 'No account active'}
-          </span>
-          <strong>
-            {session
-              ? session.role === 'company'
-                ? `${session.companyName} is active.`
-                : `Welcome back, ${session.name}.`
-              : 'Choose your path below.'}
-          </strong>
-          <p>
-            {session
-              ? 'Head to your workspace to manage projects, applications, and messages.'
-              : 'Students browse and apply. Companies post and hire. Each role has its own workspace.'}
-          </p>
-          <div className="hero-actions">
-            {session ? (
-              <a className="button button-primary" href={routeHref(workspaceRoute)}>
-                {workspaceLabel}
-              </a>
-            ) : (
-              <>
-                <a className="button button-primary" href={routeHref('/students/create-account')}>
-                  Create student account
-                </a>
-                <a className="button button-secondary" href={routeHref('/companies/create-account')}>
-                  Create company account
-                </a>
-              </>
-            )}
+        {session && (
+          <div style={{ marginTop: '1.5rem' }}>
+            <a className="button button-primary" href={routeHref(workspaceRoute)}>
+              {workspaceLabel} →
+            </a>
           </div>
-        </article>
+        )}
       </section>
 
-      {/* ── TWO PATH PANELS ──────────────────────────────────────── */}
       <section className="section-block portal-two-column">
         {/* STUDENT SIDE */}
-        <article className="panel-card tone-green">
-          <SectionHeading
-            eyebrow="Students"
-            title="Browse real work and build your portfolio."
-            description="School-verified identity. Full brief before you apply. One dashboard for every project."
-          />
+        <article className="panel-card" style={{ border: '2px solid var(--brand-green)', boxShadow: '0 4px 24px rgba(140,198,63,0.08)' }}>
+          <div className="section-heading" style={{ marginBottom: '1.25rem' }}>
+            <div>
+              <p className="eyebrow">Students</p>
+              <h2>Browse real work and build your portfolio.</h2>
+            </div>
+          </div>
 
-          <div className="list-stack">
-            <a className="list-card tone-green" href={routeHref('/students/sign-in')}>
+          <div className="list-stack" style={{ marginBottom: '1.25rem' }}>
+            <a className="list-card" href={routeHref('/students/sign-in')} style={{ borderColor: 'var(--brand-green)' }}>
               <div>
                 <strong>Sign in as student</strong>
                 <p>Return to your dashboard, application queue, and active project threads.</p>
               </div>
+              <span style={{ color: 'var(--brand-green)', fontWeight: 700, fontSize: '1.1rem' }}>→</span>
             </a>
             <a className="list-card" href={routeHref('/students/create-account')}>
               <div>
                 <strong>Create student account</strong>
-                <p>
-                  Set up your school identity, availability, rate, and skills — then start browsing
-                  with a credible profile ready to apply from.
-                </p>
+                <p>Set up your school identity, availability, and rate — then start applying.</p>
               </div>
+              <span style={{ color: 'var(--ink-soft)', fontWeight: 700, fontSize: '1.1rem' }}>→</span>
             </a>
           </div>
 
-          <div className="hero-actions" style={{ marginTop: '0.5rem' }}>
-            <a className="button button-primary" href={routeHref('/students/create-account')}>
-              Get started as a student
+          <div className="hero-actions">
+            <a className="button button-primary" href={routeHref('/students/sign-in')}>
+              Student sign in
             </a>
             <a className="button button-secondary" href={routeHref('/students')}>
-              Learn what you unlock
+              Learn more
             </a>
           </div>
         </article>
 
         {/* COMPANY SIDE */}
-        <article className="panel-card tone-orange">
-          <SectionHeading
-            eyebrow="Companies"
-            title="Post structured work and hire emerging talent."
-            description="Structured briefs. School-verified applicants. No job board fees."
-          />
+        <article className="panel-card" style={{ border: '2px solid var(--brand-orange)', boxShadow: '0 4px 24px rgba(247,148,29,0.08)' }}>
+          <div className="section-heading" style={{ marginBottom: '1.25rem' }}>
+            <div>
+              <p className="eyebrow">Companies</p>
+              <h2>Post structured work and hire emerging talent.</h2>
+            </div>
+          </div>
 
-          <div className="list-stack">
-            <a className="list-card tone-orange" href={routeHref('/companies/sign-in')}>
+          <div className="list-stack" style={{ marginBottom: '1.25rem' }}>
+            <a className="list-card" href={routeHref('/companies/sign-in')} style={{ borderColor: 'var(--brand-orange)' }}>
               <div>
                 <strong>Sign in as company</strong>
-                <p>
-                  Return to your workspace — manage live briefs, review applicants, and keep hiring
-                  conversations inside the platform.
-                </p>
+                <p>Return to your workspace — manage live briefs, review applicants, and message candidates.</p>
               </div>
+              <span style={{ color: 'var(--brand-orange)', fontWeight: 700, fontSize: '1.1rem' }}>→</span>
             </a>
             <a className="list-card" href={routeHref('/companies/create-account')}>
               <div>
                 <strong>Create company account</strong>
-                <p>
-                  Set up a verified company profile, then publish your first scoped brief in under
-                  10 minutes.
-                </p>
+                <p>Set up a verified company profile and post your first scoped brief.</p>
               </div>
+              <span style={{ color: 'var(--ink-soft)', fontWeight: 700, fontSize: '1.1rem' }}>→</span>
             </a>
           </div>
 
-          <div className="hero-actions" style={{ marginTop: '0.5rem' }}>
-            <a className="button button-primary" href={routeHref('/companies/create-account')}>
-              Get started as a company
+          <div className="hero-actions">
+            <a className="button button-primary" href={routeHref('/companies/sign-in')}>
+              Company sign in
             </a>
             <a className="button button-secondary" href={routeHref('/companies')}>
-              Learn what you unlock
+              Learn more
             </a>
           </div>
         </article>
       </section>
 
-      {/* ── BROWSE FIRST NUDGE ───────────────────────────────────── */}
       <section className="section-block">
         <div className="cta-panel-full">
           <div>
             <p className="eyebrow">Not ready to sign up?</p>
             <h2>Browse the project board first.</h2>
             <p>
-              The full project marketplace is public. Read real briefs, see actual budgets, and get
-              a feel for the work quality before you commit to anything. No account required.
+              The full marketplace is public. Read real briefs, see actual budgets, and get a feel
+              for the work quality before creating an account.
             </p>
           </div>
           <div className="cta-panel-actions">
@@ -154,9 +123,6 @@ function AuthPage({ session = null }: AuthPageProps) {
             </a>
             <a className="button button-secondary" href={routeHref('/how-it-works')}>
               How Clee works
-            </a>
-            <a className="button button-secondary" href={routeHref('/about')}>
-              About the platform
             </a>
           </div>
         </div>

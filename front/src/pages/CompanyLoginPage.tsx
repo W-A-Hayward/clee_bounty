@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import SectionHeading from '../components/SectionHeading'
 import type { CompanyAuthPayload } from '../lib/demoSession'
 import { routeHref } from '../lib/hashRouter'
 
@@ -9,42 +8,40 @@ type CompanyLoginPageProps = {
 }
 
 function CompanyLoginPage({ onSignIn, actionLabel = 'Continue to company dashboard' }: CompanyLoginPageProps) {
-  const [name, setName] = useState('Leah Martin')
-  const [email, setEmail] = useState('team@northline.io')
-  const [companyName, setCompanyName] = useState('Northline Systems')
-  const [password, setPassword] = useState('clee12345')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   return (
     <>
-      <section className="page-header split-header">
-        <div>
-          <p className="eyebrow">Company login</p>
-          <h1>Open the company workspace and manage active projects.</h1>
-          <p className="page-intro">
-            Use the company access path to return to your dashboard, review applicants, and manage
-            live project briefs.
+      <section className="section-block" style={{ paddingBottom: 0 }}>
+        <div style={{ maxWidth: '36rem' }}>
+          <p className="eyebrow">Company sign in</p>
+          <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', lineHeight: 1.2, margin: '0.5rem 0 1rem' }}>
+            Back to your workspace. Projects and applicants are waiting.
+          </h1>
+          <p className="page-intro" style={{ margin: 0 }}>
+            Sign in to manage live briefs, review candidates, and reply to applicants — all from one place.
           </p>
         </div>
 
-        <article className="info-card tone-blue">
-          <span className="mini-label">Company workspace</span>
-          <strong>Projects, applicants, and posting flow</strong>
-          <p>Use this path for company-side dashboards instead of the main member workspace.</p>
-          <p>
-            Seed company account: <strong>team@northline.io</strong> / <strong>clee12345</strong>
-          </p>
-        </article>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '1.5rem 0 0', color: 'var(--brand-orange)', fontWeight: 700, fontSize: '0.9rem' }}>
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+          Enter your credentials below
+        </div>
       </section>
 
       <section className="section-block portal-two-column">
-        <article className="panel-card">
-          <SectionHeading
-            eyebrow="Company access"
-            title="Work email and company identity"
-            description="Use the company login to simulate a verified company member entering the workspace."
-          />
+        <article className="panel-card" style={{ border: '2px solid var(--brand-orange)', boxShadow: '0 4px 24px rgba(247,148,29,0.08)' }}>
+          <div className="section-heading" style={{ marginBottom: '1.25rem' }}>
+            <div>
+              <p className="eyebrow">Company access</p>
+              <h2>Sign in to your account</h2>
+            </div>
+          </div>
 
           <form
             className="form-grid"
@@ -52,9 +49,8 @@ function CompanyLoginPage({ onSignIn, actionLabel = 'Continue to company dashboa
               event.preventDefault()
               setErrorMessage('')
               setIsSubmitting(true)
-
               try {
-                await onSignIn({ companyName, email, name, password })
+                await onSignIn({ email, name: '', companyName: '', password })
               } catch (error) {
                 setErrorMessage(error instanceof Error ? error.message : 'Unable to sign in.')
               } finally {
@@ -63,19 +59,11 @@ function CompanyLoginPage({ onSignIn, actionLabel = 'Continue to company dashboa
             }}
           >
             <label className="field-shell">
-              <span className="mini-label">Contact name</span>
-              <input onChange={(event) => setName(event.target.value)} required value={name} />
-            </label>
-
-            <label className="field-shell">
-              <span className="mini-label">Company name</span>
-              <input onChange={(event) => setCompanyName(event.target.value)} required value={companyName} />
-            </label>
-
-            <label className="field-shell">
               <span className="mini-label">Work email</span>
               <input
-                onChange={(event) => setEmail(event.target.value)}
+                autoFocus
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
                 required
                 type="email"
                 value={email}
@@ -85,7 +73,8 @@ function CompanyLoginPage({ onSignIn, actionLabel = 'Continue to company dashboa
             <label className="field-shell">
               <span className="mini-label">Password</span>
               <input
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
                 required
                 type="password"
                 value={password}
@@ -99,30 +88,58 @@ function CompanyLoginPage({ onSignIn, actionLabel = 'Continue to company dashboa
               </article>
             ) : null}
 
-            <button className="button button-primary" type="submit">
-              {isSubmitting ? 'Signing in...' : actionLabel}
+            <button className="button button-primary" disabled={isSubmitting} style={{ marginTop: '0.25rem' }} type="submit">
+              {isSubmitting ? 'Signing in…' : `${actionLabel} →`}
             </button>
+
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.82rem', color: 'var(--ink-soft)', textAlign: 'center' }}>
+              No account yet?{' '}
+              <a href={routeHref('/companies/create-account')} style={{ color: 'var(--brand-orange)', fontWeight: 700 }}>
+                Create one here
+              </a>
+            </p>
           </form>
         </article>
 
-        <article className="panel-card">
-          <SectionHeading eyebrow="Need an account?" title="Create a company profile first." />
+        <div className="story-stack">
+          <article className="info-card tone-orange">
+            <span className="mini-label">Demo credentials</span>
+            <strong>team@northline.io</strong>
+            <p>Password: <strong>clee12345</strong></p>
+            <p style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
+              Use this to explore the full company workspace — dashboard, projects, applicants, and messages.
+            </p>
+          </article>
 
-          <div className="list-stack">
-            <a className="list-card" href={routeHref('/companies/create-account')}>
-              <strong>Create company account</strong>
-              <p>Open a company profile and move into the posting flow.</p>
-            </a>
-            <a className="list-card" href={routeHref('/students/create-account')}>
-              <strong>Create student account</strong>
-              <p>Set up the student-side workspace for browsing and applications.</p>
-            </a>
-            <a className="list-card" href={routeHref('/students/sign-in')}>
-              <strong>Member sign in</strong>
-              <p>Use the main member entry if you are browsing or applying to projects.</p>
-            </a>
-          </div>
-        </article>
+          <article className="panel-card">
+            <div className="section-heading" style={{ marginBottom: '1rem' }}>
+              <div>
+                <p className="eyebrow">Other options</p>
+                <h2>Not a company?</h2>
+              </div>
+            </div>
+            <div className="list-stack">
+              <a className="list-card" href={routeHref('/companies/create-account')}>
+                <div>
+                  <strong>Create company account</strong>
+                  <p>Set up your profile and post your first project brief.</p>
+                </div>
+              </a>
+              <a className="list-card" href={routeHref('/students/sign-in')}>
+                <div>
+                  <strong>Student sign in</strong>
+                  <p>Browse projects and manage your applications.</p>
+                </div>
+              </a>
+              <a className="list-card" href={routeHref('/students/create-account')}>
+                <div>
+                  <strong>Create student account</strong>
+                  <p>Set up your school profile and start applying to projects.</p>
+                </div>
+              </a>
+            </div>
+          </article>
+        </div>
       </section>
     </>
   )

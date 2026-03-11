@@ -37,7 +37,7 @@ function ProjectsPage({ projects }: ProjectsPageProps) {
         <SectionHeading
           eyebrow="Project marketplace"
           title="Browse high-signal freelance opportunities with context up front."
-          description="This page behaves like a usable marketplace: searchable briefs, clearer result counts, and guidance on what good project cards should tell you."
+          description="Filter by skill or work mode. Every brief shows budget, timeline, and scope before you click through."
         />
 
         <div className="browse-toolbar">

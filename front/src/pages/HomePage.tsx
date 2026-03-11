@@ -1,6 +1,6 @@
 import ProjectCard from '../components/ProjectCard'
 import SectionHeading from '../components/SectionHeading'
-import type { CompanyProject } from '../data/companyPortal'
+import { companyProjects as staticCompanyProjects, type CompanyProject } from '../data/companyPortal'
 import { faqItems } from '../data/siteContent'
 import type { StudentProject } from '../data/studentPortal'
 import type { DemoSession } from '../lib/demoSession'
@@ -45,6 +45,7 @@ function HomePage({ session = null, studentProjects, companyProjects }: HomePage
   const featuredProject = studentProjects[0]
   const previewProjects = studentProjects.slice(0, 3)
   const displayedFaqItems = faqItems.slice(0, 6)
+  const displayedCompanyProjects = companyProjects.length > 0 ? companyProjects : staticCompanyProjects
 
   return (
     <>
@@ -262,7 +263,7 @@ function HomePage({ session = null, studentProjects, companyProjects }: HomePage
           />
 
           <div className="list-stack">
-            {companyProjects.slice(0, 2).map((project) => (
+            {displayedCompanyProjects.slice(0, 2).map((project) => (
               <article key={project.id} className={`list-card ${project.tone}`}>
                 <div>
                   <strong>{project.title}</strong>

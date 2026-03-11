@@ -223,7 +223,7 @@ function StudentProfilePage({ session, onSave }: StudentProfilePageProps) {
               <article className="list-card">
                 <div>
                   <strong>Applications</strong>
-                  <p>3 active applications in your pipeline</p>
+                  <p>Browse and manage your active applications</p>
                 </div>
                 <a className="button button-ghost" href={routeHref('/applications')}>
                   View
@@ -232,7 +232,7 @@ function StudentProfilePage({ session, onSave }: StudentProfilePageProps) {
               <article className="list-card">
                 <div>
                   <strong>Messages</strong>
-                  <p>2 active conversations with companies</p>
+                  <p>Open conversations with companies you have applied to.</p>
                 </div>
                 <a className="button button-ghost" href={routeHref('/messages')}>
                   Open
