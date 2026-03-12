@@ -10,3 +10,12 @@
 // 5. Set appropriate expiration times (access token: 15min-1hr, refresh token: 7-30 days)
 // 6. Handle token errors (expired, invalid, etc.)
 // 7. Export all functions
+
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
+
+export const signToken = (payload: object) =>
+  jwt.sign(payload, env.JWT_SECRET, { expiresIn: "7d" });
+
+export const verifyToken = (token: string) =>
+  jwt.verify(token, env.JWT_SECRET);

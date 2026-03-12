@@ -13,3 +13,18 @@
 // 4. Apply validation middleware to routes that need it
 // 5. Apply rate limiting to auth routes
 // 6. Export router as default
+
+import { Router } from "express";
+import { companyRegister, companyLogin, logout, me } from "../controllers/auth.controller.js";
+import { validate } from "../middleware/validate.ts";
+import { requireAuth } from "../middleware/auth.middleware.js";
+import { companyRegisterSchema, companyLoginSchema } from "../validators/auth.validators.js";
+
+const router = Router();
+
+router.post("/company/register", validate(companyRegisterSchema), companyRegister);
+router.post("/company/login", validate(companyLoginSchema), companyLogin);
+router.post("/logout", logout);
+router.get("/me", requireAuth, me);
+
+export default router;
