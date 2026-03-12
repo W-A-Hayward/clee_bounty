@@ -11,6 +11,20 @@
     "start": "node src/server.ts",
     "build": "../node_modules/.bin/tsc -p tsconfig.json",
     "check": "../node_modules/.bin/tsc --noEmit -p tsconfig.json",
-    "serve": "node dist/server.js"
+    "serve": "node dist/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:seed": "prisma db seed",
+    "prisma:studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.2"
   }
 }

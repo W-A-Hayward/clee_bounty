@@ -1,13 +1,20 @@
-// TODO: Complete auth.middleware.ts implementation
-// Steps needed:
-// 1. Import necessary dependencies (Request, Response, NextFunction from express, jwt utilities, prisma client)
-// 2. Create middleware to verify JWT tokens from Authorization header or cookies
-// 3. Extract user from token and attach to request object (req.user)
-// 4. Handle token expiration and invalid tokens
-// 5. Create role-based middleware functions:
-//    - requireAuth (any authenticated user)
-//    - requireStudent (student role only)
-//    - requireCompany (company_member or company_admin role)
-//    - requireAdmin (platform_admin or super_admin role)
-// 6. Handle session-based auth if using sessions (check session token from cookies)
-// 7. Export all middleware functions
+import type { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
+
+export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    (req as any).user = jwt.verify(token, env.JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
+  }
+};
+
+export const requireRole = (...roles: string[]) => (req: Request, res: Response, next: NextFunction) => {
+  if (!roles.includes((req as any).user.role))
+    return res.status(403).json({ error: "Forbidden" });
+  next();
+};

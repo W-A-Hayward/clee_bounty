@@ -6,3 +6,8 @@
 // 4. Add logging in development mode
 // 5. Handle graceful shutdown (disconnect on process termination)
 // 6. Export prisma client instance
+
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+export default prisma;
