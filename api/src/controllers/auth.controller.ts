@@ -27,13 +27,11 @@ const cookieOptions = {
 export const companyRegister = async (req: Request, res: Response) => {
   const { token, user, company } = await AuthService.registerCompany(req.body);
   res.cookie("token", token, cookieOptions);
-  res
-    .status(201)
-    .json({
-      token,
-      user: { id: user.id, email: user.email, role: user.role },
-      company,
-    });
+  res.status(201).json({
+    token,
+    user: { id: user.id, email: user.email, role: user.role },
+    company,
+  });
 };
 
 export const companyLogin = async (req: Request, res: Response) => {
@@ -53,4 +51,16 @@ export const logout = (_req: Request, res: Response) => {
 export const me = async (req: Request, res: Response) => {
   const user = (req as any).user;
   res.json({ user });
+};
+
+export const refresh = async (req: Request, res: Response) => {
+  const oldToken = req.cookies.token;
+  if (!oldToken) return res.status(401).json({ error: "No token" });
+
+  const { token, user } = await AuthService.refreshToken(oldToken);
+  res.cookie("token", token, cookieOptions);
+  res.json({
+    token,
+    user: { id: user.id, email: user.email, role: user.role },
+  });
 };

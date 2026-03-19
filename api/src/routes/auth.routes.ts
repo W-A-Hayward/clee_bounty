@@ -20,6 +20,7 @@ import {
   companyLogin,
   logout,
   me,
+  refresh,
 } from "../controllers/auth.controller.ts";
 import { validate } from "../middleware/validate.middleware.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
@@ -38,5 +39,6 @@ router.post(
 router.post("/company/login", validate(companyLoginSchema), companyLogin);
 router.post("/logout", logout);
 router.get("/me", requireAuth, me);
+router.post("/refresh", refresh);
 
 export default router;

@@ -16,7 +16,7 @@
 
 import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.ts";
-import { signToken } from "../utils/jwt.ts";
+import { signToken, verifyToken } from "../utils/jwt.ts";
 import { slugify } from "../utils/slug.ts";
 import type {
   CompanyRegisterInput,
@@ -93,6 +93,28 @@ export const loginCompany = async (data: CompanyLoginInput) => {
     where: { id: user.id },
     data: { lastLoginAt: new Date() },
   });
+
+  const token = signToken({ id: user.id, role: user.role });
+  return { token, user };
+};
+
+export const refreshToken = async (oldToken: string) => {
+  let payload: any;
+  try {
+    payload = verifyToken(oldToken);
+  } catch {
+    const error: any = new Error("Invalid token");
+    error.status = 401;
+    throw error;
+  }
+
+  // make sure user still exists and is active
+  const user = await prisma.user.findUnique({ where: { id: payload.id } });
+  if (!user || !user.isActive) {
+    const error: any = new Error("User not found");
+    error.status = 401;
+    throw error;
+  }
 
   const token = signToken({ id: user.id, role: user.role });
   return { token, user };
