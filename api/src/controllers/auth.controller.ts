@@ -49,8 +49,9 @@ export const logout = (_req: Request, res: Response) => {
 };
 
 export const me = async (req: Request, res: Response) => {
-  const user = (req as any).user;
-  res.json({ user });
+  const user = await AuthService.getCurrentUser((req as any).user.id);
+  const { passwordHash, ...safeUser } = user;
+  res.json({ user: safeUser });
 };
 
 export const refresh = async (req: Request, res: Response) => {

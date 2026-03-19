@@ -158,3 +158,13 @@ export const loginStudentMicrosoft = async (accessToken: string) => {
   const token = signToken({ id: user.id, role: user.role });
   return { token, user };
 };
+
+export const getCurrentUser = async (userId: string) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    const error: any = new Error("User not found");
+    error.status = 404;
+    throw error;
+  }
+  return user;
+};
