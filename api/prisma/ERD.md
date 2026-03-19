@@ -19,32 +19,20 @@ magic_link magic_link
     
 
 
-        ProjectStatus {
+        PostingStatus {
             draft draft
 open open
-in_review in_review
-matched matched
-in_progress in_progress
-completed completed
-cancelled cancelled
+closed closed
 archived archived
         }
     
 
 
-        ProjectVisibility {
-            public public
-private private
-invite_only invite_only
-        }
-    
-
-
-        ProjectType {
+        PostingType {
             freelance freelance
 internship internship
-short_project short_project
 part_time part_time
+contract contract
         }
     
 
@@ -76,8 +64,8 @@ advanced advanced
 
         ApplicationStatus {
             submitted submitted
+reviewing reviewing
 shortlisted shortlisted
-interviewing interviewing
 accepted accepted
 rejected rejected
 withdrawn withdrawn
@@ -85,30 +73,9 @@ withdrawn withdrawn
     
 
 
-        MatchStatus {
-            active active
-completed completed
-cancelled cancelled
-        }
-    
-
-
-        MilestoneStatus {
-            pending pending
-in_progress in_progress
-submitted submitted
-approved approved
-revision_requested revision_requested
-paid paid
-        }
-    
-
-
-        DeliverableStatus {
-            submitted submitted
-approved approved
-revision_requested revision_requested
-rejected rejected
+        MemberRole {
+            admin admin
+member member
         }
     
 
@@ -118,19 +85,9 @@ rejected rejected
 application_shortlisted application_shortlisted
 application_accepted application_accepted
 application_rejected application_rejected
-new_message new_message
-milestone_assigned milestone_assigned
-deliverable_reviewed deliverable_reviewed
 company_verified company_verified
-project_status_changed project_status_changed
+posting_status_changed posting_status_changed
 admin_action admin_action
-        }
-    
-
-
-        MemberRole {
-            admin admin
-member member
         }
     
   "users" {
@@ -160,7 +117,7 @@ member member
     Int graduation_year "❓"
     String bio "❓"
     String location "❓"
-    String skills_summary "❓"
+    String skills 
     String portfolio_url "❓"
     String linkedin_url "❓"
     String github_url "❓"
@@ -197,7 +154,7 @@ member member
     }
   
 
-  "projects" {
+  "postings" {
     String id "🗝️"
     String company_id 
     String created_by 
@@ -205,7 +162,7 @@ member member
     String slug 
     String short_description "❓"
     String description "❓"
-    ProjectType project_type 
+    PostingType posting_type 
     WorkMode work_mode 
     String duration "❓"
     CompensationType compensation_type 
@@ -215,83 +172,24 @@ member member
     String required_skills 
     ExperienceLevel experience_level 
     DateTime application_deadline "❓"
-    ProjectStatus status 
-    ProjectVisibility visibility 
+    PostingStatus status 
     DateTime published_at "❓"
     DateTime created_at 
     DateTime updated_at 
     }
   
 
-  "project_applications" {
+  "applications" {
     String id "🗝️"
-    String project_id 
+    String posting_id 
     String student_user_id 
     String cover_letter "❓"
+    String resume_url "❓"
     Decimal proposed_rate "❓"
+    String notes "❓"
     ApplicationStatus status 
     DateTime applied_at 
     DateTime updated_at 
-    }
-  
-
-  "project_matches" {
-    String id "🗝️"
-    String project_id 
-    String student_user_id 
-    String company_decision_by "❓"
-    DateTime matched_at 
-    MatchStatus status 
-    }
-  
-
-  "milestones" {
-    String id "🗝️"
-    String project_id 
-    String title 
-    String description "❓"
-    DateTime due_date "❓"
-    Decimal amount "❓"
-    MilestoneStatus status 
-    DateTime created_at 
-    DateTime updated_at 
-    }
-  
-
-  "deliverables" {
-    String id "🗝️"
-    String milestone_id 
-    String submitted_by 
-    String file_url "❓"
-    String notes "❓"
-    DeliverableStatus status 
-    DateTime submitted_at 
-    DateTime reviewed_at "❓"
-    }
-  
-
-  "conversations" {
-    String id "🗝️"
-    String project_id "❓"
-    DateTime created_at 
-    }
-  
-
-  "conversation_participants" {
-    String id "🗝️"
-    String conversation_id 
-    String user_id 
-    }
-  
-
-  "messages" {
-    String id "🗝️"
-    String conversation_id 
-    String sender_id 
-    String body 
-    String attachment_url "❓"
-    Boolean is_read 
-    DateTime created_at 
     }
   
 
@@ -303,17 +201,6 @@ member member
     String message 
     String link "❓"
     Boolean is_read 
-    DateTime created_at 
-    }
-  
-
-  "reviews" {
-    String id "🗝️"
-    String project_id 
-    String reviewer_id 
-    String reviewee_id 
-    Int rating 
-    String comment "❓"
     DateTime created_at 
     }
   
@@ -334,35 +221,17 @@ member member
     "company_members" |o--|| "MemberRole" : "enum:member_role"
     "company_members" }o--|| companies : "company"
     "company_members" }o--|| users : "user"
-    "projects" |o--|| "ProjectType" : "enum:project_type"
-    "projects" |o--|| "WorkMode" : "enum:work_mode"
-    "projects" |o--|| "CompensationType" : "enum:compensation_type"
-    "projects" |o--|| "ExperienceLevel" : "enum:experience_level"
-    "projects" |o--|| "ProjectStatus" : "enum:status"
-    "projects" |o--|| "ProjectVisibility" : "enum:visibility"
-    "projects" }o--|| companies : "company"
-    "projects" }o--|| users : "creator"
-    "project_applications" |o--|| "ApplicationStatus" : "enum:status"
-    "project_applications" }o--|| projects : "project"
-    "project_applications" }o--|| users : "student"
-    "project_matches" |o--|| "MatchStatus" : "enum:status"
-    "project_matches" }o--|| projects : "project"
-    "project_matches" }o--|| users : "student"
-    "project_matches" }o--|o users : "decisionBy"
-    "milestones" |o--|| "MilestoneStatus" : "enum:status"
-    "milestones" }o--|| projects : "project"
-    "deliverables" |o--|| "DeliverableStatus" : "enum:status"
-    "deliverables" }o--|| milestones : "milestone"
-    "deliverables" }o--|| users : "submitter"
-    "conversations" }o--|o projects : "project"
-    "conversation_participants" }o--|| conversations : "conversation"
-    "conversation_participants" }o--|| users : "user"
-    "messages" }o--|| conversations : "conversation"
-    "messages" }o--|| users : "sender"
+    "postings" |o--|| "PostingType" : "enum:posting_type"
+    "postings" |o--|| "WorkMode" : "enum:work_mode"
+    "postings" |o--|| "CompensationType" : "enum:compensation_type"
+    "postings" |o--|| "ExperienceLevel" : "enum:experience_level"
+    "postings" |o--|| "PostingStatus" : "enum:status"
+    "postings" }o--|| companies : "company"
+    "postings" }o--|| users : "creator"
+    "applications" |o--|| "ApplicationStatus" : "enum:status"
+    "applications" }o--|| postings : "posting"
+    "applications" }o--|| users : "student"
     "notifications" |o--|| "NotificationType" : "enum:type"
     "notifications" }o--|| users : "user"
-    "reviews" }o--|| projects : "project"
-    "reviews" }o--|| users : "reviewer"
-    "reviews" }o--|| users : "reviewee"
     "audit_logs" }o--|o users : "actor"
 ```

@@ -1,4 +1,4 @@
-## Paquetage Diagram of the backend
+## Package Diagram of the Backend
 
 ```mermaid
 graph TD
@@ -29,22 +29,19 @@ graph TD
     end
 
     subgraph middleware["middleware/"]
-        auth["auth.middleware.ts\nrequireAuth, requireRole"]
-        validate["validate.ts\nvalidate(schema)"]
+        authM["auth.middleware.ts\nrequireAuth, requireRole"]
+        validate["validate.middleware.ts\nvalidate(schema)"]
         error["errorHandler.ts\nglobal error handler"]
         ownership["ownership.middleware.ts\ncheckOwnership"]
+        rate["rateLimiter.ts\nrate limiting"]
     end
 
     subgraph validators["validators/"]
         authV["auth.validators.ts"]
         studentV["student.validators.ts"]
         companyV["company.validators.ts"]
-        projectV["project.validators.ts"]
+        postingV["posting.validators.ts"]
         applicationV["application.validators.ts"]
-        milestoneV["milestone.validators.ts"]
-        deliverableV["deliverable.validators.ts"]
-        conversationV["conversation.validators.ts"]
-        reviewV["review.validators.ts"]
     end
 
     subgraph routes["routes/"]
@@ -52,14 +49,9 @@ graph TD
         authR["auth.routes.ts"]
         studentR["student.routes.ts"]
         companyR["company.routes.ts"]
-        projectR["project.routes.ts"]
+        postingR["posting.routes.ts"]
         applicationR["application.routes.ts"]
-        matchR["match.routes.ts"]
-        milestoneR["milestone.routes.ts"]
-        deliverableR["deliverable.routes.ts"]
-        conversationR["conversation.routes.ts"]
         notificationR["notification.routes.ts"]
-        reviewR["review.routes.ts"]
         adminR["admin.routes.ts"]
     end
 
@@ -67,14 +59,9 @@ graph TD
         authC["auth.controller.ts"]
         studentC["student.controller.ts"]
         companyC["company.controller.ts"]
-        projectC["project.controller.ts"]
+        postingC["posting.controller.ts"]
         applicationC["application.controller.ts"]
-        matchC["match.controller.ts"]
-        milestoneC["milestone.controller.ts"]
-        deliverableC["deliverable.controller.ts"]
-        conversationC["conversation.controller.ts"]
         notificationC["notification.controller.ts"]
-        reviewC["review.controller.ts"]
         adminC["admin.controller.ts"]
     end
 
@@ -82,14 +69,9 @@ graph TD
         authS["auth.service.ts"]
         studentS["student.service.ts"]
         companyS["company.service.ts"]
-        projectS["project.service.ts"]
+        postingS["posting.service.ts"]
         applicationS["application.service.ts"]
-        matchS["match.service.ts"]
-        milestoneS["milestone.service.ts"]
-        deliverableS["deliverable.service.ts"]
-        conversationS["conversation.service.ts"]
         notificationS["notification.service.ts"]
-        reviewS["review.service.ts"]
         adminS["admin.service.ts"]
     end
 
@@ -97,60 +79,51 @@ graph TD
         pg[("PostgreSQL\nbounty_db")]
     end
 
-%% top level flow
-server --> app
-app --> config
-app --> middleware
-app --> routes
+    %% top level flow
+    server --> app
+    app --> config
+    app --> middleware
+    app --> routes
 
-%% routes → controllers
-index --> authR & studentR & companyR & projectR
-index --> applicationR & matchR & milestoneR & deliverableR
-index --> conversationR & notificationR & reviewR & adminR
+    %% routes → controllers
+    index --> authR & studentR & companyR & postingR
+    index --> applicationR & notificationR & adminR
 
-authR --> authC
-studentR --> studentC
-companyR --> companyC
-projectR --> projectC
-applicationR --> applicationC
-matchR --> matchC
-milestoneR --> milestoneC
-deliverableR --> deliverableC
-conversationR --> conversationC
-notificationR --> notificationC
-reviewR --> reviewC
-adminR --> adminC
+    authR --> authC
+    studentR --> studentC
+    companyR --> companyC
+    postingR --> postingC
+    applicationR --> applicationC
+    notificationR --> notificationC
+    adminR --> adminC
 
-%% controllers → services
-authC --> authS
-studentC --> studentS
-companyC --> companyS
-projectC --> projectS
-applicationC --> applicationS
-matchC --> matchS
-milestoneC --> milestoneS
-deliverableC --> deliverableS
-conversationC --> conversationS
-notificationC --> notificationS
-reviewC --> reviewS
-adminC --> adminS
+    %% controllers → services
+    authC --> authS
+    studentC --> studentS
+    companyC --> companyS
+    postingC --> postingS
+    applicationC --> applicationS
+    notificationC --> notificationS
+    adminC --> adminS
 
-%% services → prisma → db
-authS & studentS & companyS & projectS --> prisma
-applicationS & matchS & milestoneS & deliverableS --> prisma
-conversationS & notificationS & reviewS & adminS --> prisma
-prisma --> pg
+    %% services → prisma → db
+    authS & studentS & companyS & postingS --> prisma
+    applicationS & notificationS & adminS --> prisma
+    prisma --> pg
 
-%% shared utils used by services
-authS --> jwt & slug & audit
-applicationS --> audit & notif
-projectS --> slug & audit
-milestoneS --> notif & audit
-deliverableS --> notif & audit
-conversationS --> notif
+    %% shared utils
+    authS --> jwt & slug & audit
+    postingS --> slug & audit
+    applicationS --> audit & notif
+    notificationS --> notif
 
-%% middleware deps
-auth --> jwt
-validate --> validators
-controllers --> async
+    %% middleware deps
+    authM --> jwt
+    validate --> validators
+    controllers --> async
 ```
+
+```
+
+```
+
