@@ -15,14 +15,19 @@
 // 6. Export all service functions
 
 import bcrypt from "bcryptjs";
-import prisma from "../lib/prisma.js";
+import prisma from "../lib/prisma.ts";
 import { signToken } from "../utils/jwt.ts";
 import { slugify } from "../utils/slug.ts";
-import type { CompanyRegisterInput, CompanyLoginInput } from "../validators/auth.validators.js";
+import type {
+  CompanyRegisterInput,
+  CompanyLoginInput,
+} from "../validators/auth.validators.ts";
 
 export const registerCompany = async (data: CompanyRegisterInput) => {
   // check email not already taken
-  const existing = await prisma.user.findUnique({ where: { email: data.email } });
+  const existing = await prisma.user.findUnique({
+    where: { email: data.email },
+  });
   if (existing) {
     const error: any = new Error("Email already in use");
     error.status = 409;
@@ -68,7 +73,11 @@ export const registerCompany = async (data: CompanyRegisterInput) => {
 export const loginCompany = async (data: CompanyLoginInput) => {
   const user = await prisma.user.findUnique({ where: { email: data.email } });
 
-  if (!user || !user.passwordHash || !(await bcrypt.compare(data.password, user.passwordHash))) {
+  if (
+    !user ||
+    !user.passwordHash ||
+    !(await bcrypt.compare(data.password, user.passwordHash))
+  ) {
     const error: any = new Error("Invalid credentials");
     error.status = 401;
     throw error;

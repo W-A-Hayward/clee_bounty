@@ -1,0 +1,9 @@
+# register
+curl -X POST http://localhost:3000/api/auth/company/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@company.com","password":"password123","firstName":"John","lastName":"Doe","companyName":"Acme Corp"}'
+
+# login
+curl -X POST http://localhost:3000/api/auth/company/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@company.com","password":"password123"}'

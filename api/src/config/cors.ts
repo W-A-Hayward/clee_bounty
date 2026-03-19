@@ -9,3 +9,16 @@
 //    - Set allowed headers (Content-Type, Authorization, etc.)
 //    - Configure preflight options
 // 4. Export default corsOptions
+
+import cors, { type CorsOptions } from "cors"; // Import the type
+import { env } from "./env.ts";
+
+const corsOptions: CorsOptions = {
+  origin: env.FRONTEND_URL,
+  credentials: true, // needed for cookies to work cross-origin
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+export default corsOptions;
+

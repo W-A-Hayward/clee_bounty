@@ -12,10 +12,9 @@
 // 7. Export all functions
 
 import jwt from "jsonwebtoken";
-import { env } from "../config/env.js";
+import { env } from "../config/env.ts";
 
 export const signToken = (payload: object) =>
   jwt.sign(payload, env.JWT_SECRET, { expiresIn: "7d" });
 
-export const verifyToken = (token: string) =>
-  jwt.verify(token, env.JWT_SECRET);
+export const verifyToken = (token: string) => jwt.verify(token, env.JWT_SECRET);

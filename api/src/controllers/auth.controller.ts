@@ -15,7 +15,7 @@
 // 6. Export all controller functions
 
 import type { Request, Response } from "express";
-import * as AuthService from "../services/auth.service.ts";
+import * as AuthService from "../services/auth.services.ts";
 
 const cookieOptions = {
   httpOnly: true,
@@ -27,13 +27,22 @@ const cookieOptions = {
 export const companyRegister = async (req: Request, res: Response) => {
   const { token, user, company } = await AuthService.registerCompany(req.body);
   res.cookie("token", token, cookieOptions);
-  res.status(201).json({ token, user: { id: user.id, email: user.email, role: user.role }, company });
+  res
+    .status(201)
+    .json({
+      token,
+      user: { id: user.id, email: user.email, role: user.role },
+      company,
+    });
 };
 
 export const companyLogin = async (req: Request, res: Response) => {
   const { token, user } = await AuthService.loginCompany(req.body);
   res.cookie("token", token, cookieOptions);
-  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+  res.json({
+    token,
+    user: { id: user.id, email: user.email, role: user.role },
+  });
 };
 
 export const logout = (_req: Request, res: Response) => {

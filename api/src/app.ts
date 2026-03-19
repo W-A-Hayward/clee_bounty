@@ -3,9 +3,9 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
-import routes from "./routes/index.js";
-import { errorHandler } from "./middleware/errorHandler.js";
-import corsOptions from "./config/cors.js";
+import routes from "./routes/index.ts";
+import { errorHandler } from "./middleware/errorHandler.ts";
+import corsOptions from "./config/cors.ts";
 
 export const app = express();
 
