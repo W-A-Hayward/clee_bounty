@@ -25,5 +25,10 @@ export const companyLoginSchema = z.object({
   password: z.string(),
 });
 
+export const studentMicrosoftSchema = z.object({
+  accessToken: z.string(),
+});
+
 export type CompanyRegisterInput = z.infer<typeof companyRegisterSchema>;
 export type CompanyLoginInput = z.infer<typeof companyLoginSchema>;
+export type StudentMicrosoftInput = z.infer<typeof studentMicrosoftSchema>;

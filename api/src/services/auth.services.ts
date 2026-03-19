@@ -17,6 +17,7 @@
 import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.ts";
 import { signToken, verifyToken } from "../utils/jwt.ts";
+import { getMicrosoftUser } from "../utils/microsoft.ts";
 import { slugify } from "../utils/slug.ts";
 import type {
   CompanyRegisterInput,
@@ -115,6 +116,44 @@ export const refreshToken = async (oldToken: string) => {
     error.status = 401;
     throw error;
   }
+
+  const token = signToken({ id: user.id, role: user.role });
+  return { token, user };
+};
+
+export const loginStudentMicrosoft = async (accessToken: string) => {
+  const msUser = await getMicrosoftUser(accessToken);
+
+  if (!msUser.email) {
+    const error: any = new Error(
+      "Could not retrieve email from Microsoft account",
+    );
+    error.status = 400;
+    throw error;
+  }
+
+  const user = await prisma.user.upsert({
+    where: { microsoftOid: msUser.oid },
+    update: {
+      lastLoginAt: new Date(),
+      firstName: msUser.firstName,
+      lastName: msUser.lastName,
+      displayName: msUser.displayName,
+    },
+    create: {
+      email: msUser.email,
+      microsoftOid: msUser.oid,
+      tenantId: msUser.tenantId,
+      firstName: msUser.firstName,
+      lastName: msUser.lastName,
+      displayName: msUser.displayName,
+      role: "student",
+      authProvider: "microsoft",
+      studentProfile: {
+        create: {}, // create empty profile automatically
+      },
+    },
+  });
 
   const token = signToken({ id: user.id, role: user.role });
   return { token, user };

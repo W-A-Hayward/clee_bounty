@@ -64,3 +64,12 @@ export const refresh = async (req: Request, res: Response) => {
     user: { id: user.id, email: user.email, role: user.role },
   });
 };
+
+export const studentMicrosoftLogin = async (req: Request, res: Response) => {
+  const { accessToken } = req.body;
+  const { token, user } = await AuthService.loginStudentMicrosoft(accessToken);
+  res.cookie("token", token, cookieOptions);
+  res
+    .status(200)
+    .json({ token, user: { id: user.id, email: user.email, role: user.role } });
+};
