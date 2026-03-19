@@ -1,10 +1,21 @@
-// TODO: Complete auditLog.ts implementation
-// Steps needed:
-// 1. Import prisma client
-// 2. Create function to log audit events:
-//    - createAuditLog(actorUserId, actionType, entityType, entityId, metadata)
-// 3. Define action types (CREATE, UPDATE, DELETE, LOGIN, LOGOUT, etc.)
-// 4. Define entity types (USER, PROJECT, APPLICATION, MATCH, etc.)
-// 5. Store metadata as JSON for flexible logging
-// 6. Handle errors gracefully (don't fail request if audit log fails)
-// 7. Export audit log function
+// logging audits to the db
+// example usage : await log(userId, "company_registered", "Company", company.id);
+import prisma from "../lib/prisma.js";
+
+export const log = async (
+  actorUserId: string | null,
+  actionType: string,
+  entityType: string,
+  entityId: string,
+  metadata?: object,
+) => {
+  await prisma.auditLog.create({
+    data: {
+      actorUserId,
+      actionType,
+      entityType,
+      entityId,
+      metadataJson: metadata ?? {},
+    },
+  });
+};
