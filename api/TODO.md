@@ -14,8 +14,8 @@
 
 **1. Finish utils**
 
-- `utils/auditLog.ts`
-- `utils/notification.ts`
+- [x] `utils/auditLog.ts`
+- [x] `utils/notification.ts`
 
 **2. Student routes**
 
@@ -26,9 +26,9 @@
 
 **3. Company routes**
 
-- `POST /companies` — create company
+- [x] `POST /companies` — create company (accomplished when creating user)
 - `GET /companies/:slug` — public profile
-- `PATCH /companies/:id` — update company
+- [x] `PATCH /companies/:id` — update company
 - `POST /companies/:id/invite` — invite member
 - `GET /companies/:id/members` — list members
 
