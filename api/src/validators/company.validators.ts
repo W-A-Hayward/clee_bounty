@@ -10,3 +10,14 @@
 // 5. Validate URLs (logoUrl, website)
 // 6. Validate memberRole is valid enum value
 // 7. Export validation chains/arrays for each endpoint
+import { z } from "zod";
+
+export const updateCompanySchema = z.object({
+  logoUrl: z.string().url().optional(),
+  website: z.string().url().optional(),
+  industry: z.string().optional(),
+  companySize: z.string().optional(),
+  description: z.string().optional(),
+});
+
+export type UpdateCompanyInput = z.infer<typeof updateCompanySchema>;
