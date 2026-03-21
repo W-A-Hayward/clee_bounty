@@ -9,4 +9,9 @@ export const updateCompanySchema = z.object({
   description: z.string().optional(),
 });
 
+export const inviteMemberSchema = z.object({
+  email: z.email(),
+});
+
 export type UpdateCompanyInput = z.infer<typeof updateCompanySchema>;
+export type InviteMemberInput = z.infer<typeof inviteMemberSchema>;

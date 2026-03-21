@@ -11,15 +11,37 @@ export const updateCompany = async (
     where: { slug: slug },
     data,
   });
-
+  if (!updatedCompany) {
+    const error: any = new Error("Company not found");
+    error.status = 404;
+    throw error;
+  }
   await log(slug, "update", "company", JSON.stringify(data));
 
-  return updatedCompany;
+  return updatedCompany; 
 };
 
+// for public profile
 export const getCompanyProfile = async (slug: string) => {
+  return prisma.company.findUnique({
+    where: { slug },
+    include: { postings: true },
+  });
+};
+
+// for member operations
+export const getCompanyWithMembers = async (slug: string) => {
+  return prisma.company.findUnique({
+    where: { slug },
+    include: { members: true },
+  });
+};
+
+// company.service.ts
+export const companyInviteMember = async (adminId: string, slug: string, email: string) => {
   const company = await prisma.company.findUnique({
     where: { slug },
+    include: { members: true },
   });
 
   if (!company) {
@@ -28,5 +50,22 @@ export const getCompanyProfile = async (slug: string) => {
     throw error;
   }
 
-  return company;
+  // find the user to invite by email
+  const userToInvite = await prisma.user.findUnique({ where: { email } });
+  if (!userToInvite) {
+    const error: any = new Error("User not found");
+    error.status = 404;
+    throw error;
+  }
+
+  const alreadyMember = company.members.find((m) => m.userId === userToInvite.id);
+  if (alreadyMember) {
+    const error: any = new Error("User already a member");
+    error.status = 400;
+    throw error;
+  }
+
+  return prisma.companyMember.create({
+    data: { companyId: company.id, userId: userToInvite.id, invitedBy: adminId },
+  });
 };
