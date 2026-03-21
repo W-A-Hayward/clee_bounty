@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { companyUpdate } from "../controllers/company.controller.ts";
+import { companyUpdate, companyPublicProfile } from "../controllers/company.controller.ts";
 import { validate } from "../middleware/validate.middleware.ts";
 import { updateCompanySchema } from "../validators/company.validators.ts";
 import { requireAuth, requireRole } from "../middleware/auth.middleware.ts";
@@ -13,5 +13,6 @@ router.patch(
   validate(updateCompanySchema),
   companyUpdate,
 );
+router.get("/:slug", requireAuth, companyPublicProfile);
 
 export default router;
