@@ -28,7 +28,7 @@
 
 - [x] `POST /companies` — create company (accomplished when creating user)
 - `GET /companies/:slug` — public profile
-- [x] `PATCH /companies/:id` — update company
+- `PATCH /companies/:id` — update company
 - `POST /companies/:id/invite` — invite member
 - `GET /companies/:id/members` — list members
 

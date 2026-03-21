@@ -1,15 +1,3 @@
-// TODO: Complete auth.validators.ts implementation
-// Steps needed:
-// 1. Import express-validator or zod for validation
-// 2. Create validation rules for:
-//    - registerCompany: name, email, password, companyName, website, industry, location, teamSize, description
-//    - loginCompany: email, password
-//    - logout
-// 3. Validate email format
-// 4. Validate password strength (min length, complexity if needed)
-// 5. Sanitize inputs
-// 6. Export validation chains/arrays for each endpoint
-
 import { z } from "zod";
 
 export const companyRegisterSchema = z.object({
