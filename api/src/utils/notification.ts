@@ -1,19 +1,13 @@
-// TODO: Complete notification.ts implementation
-// Steps needed:
-// 1. Import prisma client (currently missing import)
-// 2. Add proper TypeScript types for all parameters
-// 3. Create additional notification functions:
-//    - getNotifications(userId, filters)
-//    - markAsRead(notificationId)
-//    - markAllAsRead(userId)
-//    - deleteNotification(notificationId)
-// 4. Handle notification creation errors
-// 5. Support batch notification creation
-// 6. Export all functions
-
 import prisma from "../lib/prisma.ts";
+import type { NotificationType } from "@prisma/client";
 
-export const createNotification = (userId, type, title, message, link?) =>
+export const createNotification = (
+  userId: string,
+  type: NotificationType,
+  title: string,
+  message: string,
+  link?: string,
+) =>
   prisma.notification.create({
-    data: { userId, type, title, message, link },
+    data: { userId, type, title, message, link: link ?? null },
   });
