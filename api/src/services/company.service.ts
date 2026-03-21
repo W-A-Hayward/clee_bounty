@@ -3,25 +3,30 @@ import { log } from "../utils/auditLog.ts";
 import { Prisma } from "@prisma/client";
 
 export const updateCompany = async (
-  userId: string,
+  slug: string,
   data: Prisma.CompanyUpdateInput,
 ) => {
-  const membership = await prisma.companyMember.findFirst({
-    where: { userId },
+
+  const updatedCompany = await prisma.company.update({
+    where: { slug: slug },
+    data,
   });
 
-  if (!membership) {
-    const error: any = new Error("No company found for this user");
+  await log(slug, "update", "company", JSON.stringify(data));
+
+  return updatedCompany;
+};
+
+export const getCompanyProfile = async (slug: string) => {
+  const company = await prisma.company.findUnique({
+    where: { slug },
+  });
+
+  if (!company) {
+    const error: any = new Error("Company not found");
     error.status = 404;
     throw error;
   }
 
-  const updatedCompany = await prisma.company.update({
-    where: { id: membership.companyId },
-    data,
-  });
-
-  await log(userId, "update", "company", membership.companyId, { data });
-
-  return updatedCompany;
+  return company;
 };
