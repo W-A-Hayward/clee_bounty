@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const companyRegisterSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
@@ -9,7 +9,7 @@ export const companyRegisterSchema = z.object({
 });
 
 export const companyLoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string(),
 });
 
