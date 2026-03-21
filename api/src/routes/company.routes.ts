@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { companyUpdate, companyPublicProfile, companyInviteMember } from "../controllers/company.controller.ts";
+import { companyUpdate, companyPublicProfile, companyInviteMember, companyGetMembers } from "../controllers/company.controller.ts";
 import { validate } from "../middleware/validate.middleware.ts";
 import { updateCompanySchema, inviteMemberSchema } from "../validators/company.validators.ts";
 import { requireAuth, requireRole } from "../middleware/auth.middleware.ts";
@@ -15,5 +15,6 @@ router.patch(
 );
 router.get("/:slug", requireAuth, companyPublicProfile);
 router.post("/:slug/invite", requireAuth, requireRole("company_admin"), validate(inviteMemberSchema), companyInviteMember);
+router.get("/:slug/list-members", requireAuth, companyGetMembers);
 
 export default router;

@@ -43,3 +43,9 @@ export const companyInviteMember = asyncHandler(
   },
 );
 
+export const companyGetMembers = asyncHandler(
+  async (req: Request, res: Response) => {
+    const members = await CompanyService.getCompanyMembers(req.params.slug as string);
+    res.status(200).json({ members });
+  }
+);

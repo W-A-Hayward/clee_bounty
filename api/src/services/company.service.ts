@@ -69,3 +69,16 @@ export const companyInviteMember = async (adminId: string, slug: string, email: 
     data: { companyId: company.id, userId: userToInvite.id, invitedBy: adminId },
   });
 };
+
+export const getCompanyMembers = async (slug: string) => {
+  const members = await prisma.companyMember.findMany({
+    where: { company : { slug } },
+    include: { user: true },
+  });
+  if (!members) {
+    const error: any = new Error("Members not found");
+    error.status = 404;
+    throw error;
+  }
+  return members;
+};
