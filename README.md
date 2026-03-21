@@ -27,8 +27,8 @@
 **3. Company routes**
 
 - [x] `POST /companies` — create company (accomplished when creating user)
-- `GET /companies/:slug` — public profile
-- `PATCH /companies/:id` — update company
+- [x] `GET /companies/:slug` — public profile
+- [x] `PATCH /companies/:id` — update company
 - `POST /companies/:id/invite` — invite member
 - `GET /companies/:id/members` — list members
 
