@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
-import * as CompanyService from "../services/company.service.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import type { CompanyMember } from "@prisma/client";
+import * as CompanyService from "../services/company.service.ts";
+import { asyncHandler } from "../utils/asyncHandler.ts";
 
 export const companyUpdate = asyncHandler(
   async (req: Request, res: Response) => {
@@ -15,21 +14,11 @@ export const companyUpdate = asyncHandler(
 
 export const companyPublicProfile = asyncHandler(
   async (req: Request, res: Response) => {
-    if (!req.params.slug) {
-      res.status(400).json({ error: "Missing slug" });
-      return;
-    }
-    const { slug } = req.params;
-
-    if (Array.isArray(slug)) {
-      res.status(400).json({ error: "Invalid slug" });
-      return;
-    }
-    const company = await CompanyService.getCompanyProfile(slug);
-    const { id, createdAt, updatedAt, ...safeCompany } = company as any;
-    res.status(200).json({ company: safeCompany }); 
-        res.status(200).json({ company: safeCompany });
-    },
+    const company = await CompanyService.getCompanyProfile(
+      req.params.slug as string,
+    );
+    res.status(200).json({ company });
+  },
 );
 
 export const companyInviteMember = asyncHandler(
@@ -39,13 +28,15 @@ export const companyInviteMember = asyncHandler(
       req.params.slug as string,
       req.body.email as string,
     );
-    res.status(200).json({ member: invitedMember });
+    res.status(201).json({ member: invitedMember });
   },
 );
 
 export const companyGetMembers = asyncHandler(
   async (req: Request, res: Response) => {
-    const members = await CompanyService.getCompanyMembers(req.params.slug as string);
+    const members = await CompanyService.getCompanyMembers(
+      req.params.slug as string,
+    );
     res.status(200).json({ members });
-  }
+  },
 );
