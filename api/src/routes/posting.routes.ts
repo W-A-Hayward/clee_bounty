@@ -1,15 +1,48 @@
-// TODO: Complete project.routes.ts implementation
-// Steps needed:
-// 1. Import express Router, project controller, validators, auth middleware, ownership middleware
-// 2. Create router instance
-// 3. Define routes:
-//    - POST / - create project (requireAuth, requireCompany, validate project data)
-//    - GET /:idOrSlug - get project by ID or slug (public for open projects, requireAuth for others)
-//    - GET / - list projects (public or requireAuth, with query params for filters)
-//    - PUT /:id - update project (requireAuth, requireCompany, checkProjectOwnership)
-//    - PUT /:id/status - update project status (requireAuth, requireCompany, checkProjectOwnership)
-//    - POST /:id/publish - publish project (requireAuth, requireCompany, checkProjectOwnership)
-//    - DELETE /:id - delete project (requireAuth, requireCompany, checkProjectOwnership)
-// 4. Apply appropriate middleware to each route
-// 5. Apply validation middleware where needed
-// 6. Export router as default
+import { Router } from "express";
+import { validate } from "../middleware/validate.middleware.ts";
+import {
+  createPostingSchema,
+  editPostingSchema,
+  updatePostingStatusSchema,
+} from "../validators/posting.validators.ts";
+import { requireAuth, requireRole } from "../middleware/auth.middleware.ts";
+import {
+  getPostings,
+  getPostingsById,
+  createPosting,
+  editPostingById,
+  patchPostingStatus,
+  deletePosting,
+} from "../controllers/posting.controller.ts";
+
+const router = Router();
+
+router.get("/postings", requireAuth, getPostings);
+router.get("/postings/:id", requireAuth, getPostingsById);
+router.post(
+  "/postings",
+  requireAuth,
+  requireRole("company_admin"),
+  validate(createPostingSchema),
+  createPosting,
+);
+router.patch(
+  "/postings/:id",
+  requireAuth,
+  requireRole("company_admin"),
+  validate(editPostingSchema),
+  editPostingById,
+);
+router.patch(
+  "/postings/:id/status",
+  requireAuth,
+  requireRole("company_admin"),
+  validate(updatePostingStatusSchema),
+  patchPostingStatus,
+);
+router.delete(
+  "/postings/:id",
+  requireAuth,
+  requireRole("company_admin"),
+  deletePosting,
+);
