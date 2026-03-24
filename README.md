@@ -34,12 +34,12 @@
 
 **4. Posting routes**
 
-- `GET /postings` — browse all open postings (public)
-- `GET /postings/:slug` — view one posting (public)
-- `POST /postings` — create posting (company only)
-- `PATCH /postings/:id` — edit posting (company only)
-- `PATCH /postings/:id/status` — open, close, archive
-- `DELETE /postings/:id` — delete posting
+- [x] `GET /postings` — browse all open postings (public)
+- [x] `GET /postings/:slug` — view one posting (public)
+- [x] `POST /postings` — create posting (company only)
+- [x] `PATCH /postings/:id` — edit posting (company only)
+- [x] `PATCH /postings/:id/status` — open, close, archive
+- [x] `DELETE /postings/:id` — delete posting
 
 **5. Application routes**
 
