@@ -1,13 +1,21 @@
-// TODO: Complete notification.controller.ts implementation
-// Steps needed:
-// 1. Import necessary dependencies (Request, Response, notification service, auth middleware)
-// 2. Implement controller functions:
-//    - getNotifications(req, res, next) - get user's notifications with pagination and filters
-//    - getNotification(req, res, next) - get single notification
-//    - markAsRead(req, res, next) - mark notification as read
-//    - markAllAsRead(req, res, next) - mark all notifications as read
-//    - deleteNotification(req, res, next) - delete notification
-//    - getUnreadCount(req, res, next) - get count of unread notifications
-// 3. Ensure users can only access their own notifications
-// 4. Handle errors and return appropriate HTTP responses
-// 5. Export all controller functions
+import { asyncHandler } from "../utils/asyncHandler.ts";
+import { Request, Response } from "express";
+import * as notifServices from "../services/notification.service.ts";
+
+export const getAll = asyncHandler((req: Request, res: Response) => {
+  const notifs = await notifServices.fetchAll((req as any).user.id);
+  res.status(200).json({ notifications: notifs });
+});
+
+export const markOneRead = asyncHandler((req: Request, res: Response) => {
+  const notif = await notifServices.readOne(
+    (req as any).user.id,
+    req.params.id,
+  );
+  res.status(200).json({ notifications: notif });
+});
+
+export const markAllRead = asyncHandler((req: Request, res: Response) => {
+  const notifs = await notifServices.readAll((req as any).user.id);
+  res.status(200).json({ notifications: notifs });
+});
