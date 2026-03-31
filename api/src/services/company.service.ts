@@ -62,6 +62,11 @@ export const companyInviteMember = async (
     error.status = 404;
     throw error;
   }
+  if (userToInvite.role === "student") {
+    const error: any = new Error("Cannot invite a student as a company member");
+    error.status = 400;
+    throw error;
+  }
 
   const alreadyMember = company.members.find(
     (m) => m.userId === userToInvite.id,

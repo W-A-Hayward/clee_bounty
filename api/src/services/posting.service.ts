@@ -27,6 +27,14 @@ export const createPosting = async (
   userId: string,
   data: Prisma.PostingCreateInput,
 ) => {
+  const slug = slugify(data.title as string);
+  const existing = await prisma.posting.findUnique({ where: { slug } });
+  if (existing) {
+    const error: any = new Error("A posting with this title already exists");
+    error.status = 409;
+    throw error;
+  }
+
   const membership = await prisma.companyMember.findFirst({
     where: { userId },
   });
@@ -54,6 +62,15 @@ export const editPostingById = async (
   userId: string,
   data: Prisma.PostingUpdateInput,
 ) => {
+  const membership = await prisma.companyMember.findFirst({
+    where: { userId },
+  });
+  if (posting.companyId !== membership?.companyId) {
+    const error: any = new Error("You do not own this posting");
+    error.status = 403;
+    throw error;
+  }
+
   const posting = await prisma.posting.findUnique({ where: { id } });
   if (!posting) {
     const error: any = new Error("Posting not found");

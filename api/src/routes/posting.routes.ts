@@ -17,32 +17,27 @@ import {
 
 const router = Router();
 
-router.get("/postings", requireAuth, getPostings);
-router.get("/postings/:id", requireAuth, getPostingsById);
+router.get("/", requireAuth, getPostings);
+router.get("/:id", requireAuth, getPostingsById);
 router.post(
-  "/postings",
+  "/",
   requireAuth,
   requireRole("company_admin"),
   validate(createPostingSchema),
   createPosting,
 );
 router.patch(
-  "/postings/:id",
+  "/:id",
   requireAuth,
   requireRole("company_admin"),
   validate(editPostingSchema),
   editPostingById,
 );
 router.patch(
-  "/postings/:id/status",
+  "/:id/status",
   requireAuth,
   requireRole("company_admin"),
   validate(updatePostingStatusSchema),
   patchPostingStatus,
 );
-router.delete(
-  "/postings/:id",
-  requireAuth,
-  requireRole("company_admin"),
-  deletePosting,
-);
+router.delete("/:id", requireAuth, requireRole("company_admin"), deletePosting);
