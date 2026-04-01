@@ -8,7 +8,7 @@ import {
 import { requireAuth, requireRole } from "../middleware/auth.middleware.ts";
 import {
   getPostings,
-  getPostingsById,
+  getPostingById,
   createPosting,
   editPostingById,
   patchPostingStatus,
@@ -18,7 +18,7 @@ import {
 const router = Router();
 
 router.get("/", requireAuth, getPostings);
-router.get("/:id", requireAuth, getPostingsById);
+router.get("/:id", requireAuth, getPostingById);
 router.post(
   "/",
   requireAuth,
