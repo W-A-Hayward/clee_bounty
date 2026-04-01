@@ -40,20 +40,20 @@
 - [x] `PATCH /postings/:id` — edit posting (company only)
 - [x] `PATCH /postings/:id/status` — open, close, archive
 - [x] `DELETE /postings/:id` — delete posting
+- [x] `POST /postings/:id/apply` — student applies (CV + cover letter)
+- [x] `GET /postings/:id/applications` — company views applicants
 
 **5. Application routes**
 
-- `POST /postings/:id/apply` — student applies (CV + cover letter)
-- `GET /postings/:id/applications` — company views applicants
-- `GET /applications/me` — student views own applications
-- `PATCH /applications/:id/status` — company updates status
-- `DELETE /applications/:id` — student withdraws
+- [x] `GET /applications/me` — student views own applications
+- [x] `PATCH /applications/:id/status` — company updates status
+- [x] `DELETE /applications/:id` — student withdraws
 
 **6. Notification routes**
 
-- `GET /notifications` — get all for current user
-- `PATCH /notifications/:id/read` — mark one read
-- `PATCH /notifications/read-all` — mark all read
+- [x] `GET /notifications` — get all for current user
+- [x] `PATCH /notifications/:id/read` — mark one read
+- [x] `PATCH /notifications/read-all` — mark all read
 
 **7. Admin routes**
 
