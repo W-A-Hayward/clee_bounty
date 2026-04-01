@@ -1,13 +1,34 @@
-// TODO: Complete application.controller.ts implementation
-// Steps needed:
-// 1. Import necessary dependencies (Request, Response, application service, auth middleware, ownership middleware)
-// 2. Implement controller functions:
-//    - createApplication(req, res, next) - submit new application to project
-//    - getApplication(req, res, next) - get application details
-//    - getApplicationsByProject(req, res, next) - list applications for a project (company only)
-//    - getApplicationsByStudent(req, res, next) - list student's applications
-//    - updateApplicationStatus(req, res, next) - update status (shortlisted, accepted, rejected) - company only
-//    - withdrawApplication(req, res, next) - student withdraws their application
-// 3. Ensure proper authorization (students can only see their own, companies can see project applications)
-// 4. Handle errors and return appropriate HTTP responses
-// 5. Export all controller functions
+import type { Request, Response } from "express";
+import * as ApplicationService from "../services/application.service.ts";
+import { asyncHandler } from "../utils/asyncHandler.ts";
+import { ApplicationStatus } from "@prisma/client";
+
+export const getApplications = asyncHandler(
+  async (req: Request, res: Response) => {
+    const applications = await ApplicationService.getApplications(
+      (req as any).user.id,
+    );
+    res.status(200).json({ applications });
+  },
+);
+
+export const updateApplicationStatus = asyncHandler(
+  async (req: Request, res: Response) => {
+    const updatedApplication = await ApplicationService.updateApplicationStatus(
+      (req as any).user.id,
+      req.params.id as string,
+      req.body.status as ApplicationStatus,
+    );
+    res.status(200).json({ application: updatedApplication });
+  },
+);
+
+export const applicationWithdraw = asyncHandler(
+  async (req: Request, res: Response) => {
+    const updatedApplication = await ApplicationService.withdrawApplication(
+      (req as any).user.id,
+      req.params.id as string,
+    );
+    res.status(204).json({ application: updatedApplication });
+  },
+);

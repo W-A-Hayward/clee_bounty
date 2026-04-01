@@ -1,14 +1,74 @@
-// TODO: Complete application.service.ts implementation
-// Steps needed:
-// 1. Import necessary dependencies (prisma client, error handling, notification utils, audit log)
-// 2. Implement service functions:
-//    - createApplication(studentUserId, projectId, data) - create application, check for duplicates
-//    - getApplication(applicationId) - get application with project and student details
-//    - getApplicationsByProject(projectId, filters) - list applications for project with student info
-//    - getApplicationsByStudent(studentUserId, filters) - list student's applications with project info
-//    - updateApplicationStatus(applicationId, status, updatedBy) - update status, create notifications
-//    - withdrawApplication(applicationId, studentUserId) - mark as withdrawn
-// 3. Create notifications when application status changes
-// 4. Handle business logic (can't apply twice, can't apply to closed projects, etc.)
-// 5. Handle errors appropriately
-// 6. Export all service functions
+import prisma from "../lib/prisma.ts";
+import { log } from "../utils/auditLog.ts";
+import { ApplicationStatus } from "@prisma/client";
+
+export const getApplications = async (userId: string) => {
+  const applications = await prisma.application.findMany({
+    where: { studentUserId: userId },
+    include: { posting: true },
+  });
+  if (!applications) {
+    const error: any = new Error("Applications not found");
+    error.status = 404;
+    throw error;
+  }
+  return applications;
+};
+
+export const updateApplicationStatus = async (
+  applicationId: string,
+  userId: string,
+  status: ApplicationStatus,
+) => {
+  // find the application and include the posting and its company
+  const application = await prisma.application.findUnique({
+    where: { id: applicationId },
+    include: {
+      posting: {
+        include: { company: { include: { members: true } } }
+      }
+    }
+  });
+
+  if (!application) {
+    const error: any = new Error("Application not found");
+    error.status = 404;
+    throw error;
+  }
+
+  // check that the user is a member of the company that owns the posting
+  const isMember = application.posting.company.members.some(
+    (m) => m.userId === userId
+  );
+
+  if (!isMember) {
+    const error: any = new Error("You do not have access to this application");
+    error.status = 403;
+    throw error;
+  }
+
+  await log(userId, "update", "application", applicationId, { status });
+
+  return prisma.application.update({
+    where: { id: applicationId },
+    data: { status },
+  });
+};
+
+export const withdrawApplication = async (
+  applicationId: string,
+  userId: string,
+) => {
+  const application = await prisma.application.delete({
+    where: { id: applicationId, studentUserId: userId },
+  });
+  if (!application) {
+    const error: any = new Error("Application not found for user");
+    error.status = 404;
+    throw error;
+  }
+
+  await log(userId, "delete", "application", applicationId);
+
+  return application;
+};
