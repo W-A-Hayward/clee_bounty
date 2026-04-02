@@ -1,11 +1,20 @@
-// TODO: Complete multer.ts configuration
-// Steps needed:
-// 1. Install and import multer package
-// 2. Configure storage (use diskStorage or memoryStorage)
-// 3. Set up file upload directory (create if doesn't exist)
-// 4. Configure file filter to validate file types (e.g., images, PDFs, documents)
-// 5. Set file size limits (e.g., max 10MB)
-// 6. Export configured multer middleware instances:
-//    - single file upload middleware
-//    - multiple files upload middleware
-//    - specific field name uploads (e.g., avatar, resume, deliverable files)
+import multer from "multer";
+import path from "path";
+
+const storage = multer.diskStorage({
+  destination: "uploads/",
+  filename: (_req, file, cb) => {
+    // give it a unique name to avoid collisions
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+export const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (_req, file, cb) => {
+    const allowed = [".pdf", ".doc", ".docx"];
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, allowed.includes(ext));
+  },
+});

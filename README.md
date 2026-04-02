@@ -20,8 +20,8 @@
 **2. Student routes**
 
 - `GET /students/me` — get own profile
-- `PATCH /students/me` — update profile
-- `POST /students/me/resume` — upload CV (multer)
+- [x] `PATCH /students/me` — update profile
+- [x] `POST /students/me/resume` — upload CV (multer)
 - `GET /students/:id` — public profile
 
 **3. Company routes**
