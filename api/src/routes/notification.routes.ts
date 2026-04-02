@@ -7,3 +7,5 @@ const router = Router();
 router.get("/", requireAuth, notifController.getAll);
 router.patch("/read-all", requireAuth, notifController.markAllRead);
 router.patch("/:id/read", requireAuth, notifController.markOneRead);
+
+export default router;

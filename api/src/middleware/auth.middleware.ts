@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.ts";
 
-export type Role = "admin" | "company_admin" | "company_member" | "student";
+export type Role = "platform_admin" | "company_admin" | "company_member" | "student";
 
 export const requireAuth = (
   req: Request,
@@ -21,8 +21,8 @@ export const requireAuth = (
 
 export const requireRole =
   (...roles: Role[]) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    if (!roles.includes((req as any).user.role))
-      return res.status(403).json({ error: "Forbidden" });
-    next();
-  };
+    (req: Request, res: Response, next: NextFunction) => {
+      if (!roles.includes((req as any).user.role))
+        return res.status(403).json({ error: "Forbidden" });
+      next();
+    };

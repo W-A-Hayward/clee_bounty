@@ -41,3 +41,5 @@ router.patch(
   patchPostingStatus,
 );
 router.delete("/:id", requireAuth, requireRole("company_admin"), deletePosting);
+
+export default router;
