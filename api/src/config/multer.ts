@@ -3,7 +3,7 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: "uploads/",
-  filename: (_req, file, cb) => {
+  filename: (_req: any, file: any, cb: any) => {
     // give it a unique name to avoid collisions
     cb(null, `${Date.now()}-${file.originalname}`);
   },
@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
 export const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-  fileFilter: (_req, file, cb) => {
+  fileFilter: (_req: any, file: any, cb: any) => {
     const allowed = [".pdf", ".doc", ".docx"];
     const ext = path.extname(file.originalname).toLowerCase();
     cb(null, allowed.includes(ext));
