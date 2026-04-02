@@ -1,20 +1,18 @@
 import { z } from "zod";
 
-export const studentProfileInput = z.object({
-  schoolName : z.string().min(1),
-  programName : z.string().min(1),
-  graduationYear : z.number().min(1900).max(3000),
-  bio : z.string().min(1),
-  location : z.string().min(1),
-  skills : z.string().min(1),
-  portfolioUrl : z.string().min(1),
-  linkedinUrl : z.string().min(1),
-  githubUrl : z.string().min(1),
-  availability : z.string().min(1),
-  hourlyRate : z.number().min(0),
-  createdAt : z.date(),
-  updatedAt : z.date(),
-}).partial();
+export const updateStudentSchema = z.object({
+  schoolName: z.string().min(1).optional(),
+  programName: z.string().min(1).optional(),
+  graduationYear: z.number().int().min(2000).max(2035).optional(),
+  bio: z.string().optional(),
+  location: z.string().optional(),
+  skills: z.array(z.string()).optional(),
+  portfolioUrl: z.url().optional(),
+  linkedinUrl: z.url().optional(),
+  githubUrl: z.url().optional(),
+  availability: z.string().optional(),
+  hourlyRate: z.number().positive().optional(),
+});
 
-export type StudentProfileSchema = z.infer<typeof studentProfileInput>;
+export type UpdateStudentInput = z.infer<typeof updateStudentSchema>;
               
