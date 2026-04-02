@@ -57,9 +57,9 @@
 
 **7. Admin routes**
 
-- `GET /admin/users`
-- `PATCH /admin/users/:id/status`
-- `GET /admin/companies`
-- `PATCH /admin/companies/:id/verify`
-- `GET /admin/postings`
-- `GET /admin/audit-logs`
+- [x] `GET /admin/users`
+- [x] `PATCH /admin/users/:id/status`]
+- [x] `GET /admin/companies`]
+- [x] `PATCH /admin/companies/:id/verify`]
+- [x] `GET /admin/postings`]
+- [x] `GET /admin/audit-logs`]
