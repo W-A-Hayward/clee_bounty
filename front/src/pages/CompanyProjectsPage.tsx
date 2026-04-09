@@ -125,16 +125,31 @@ function CompanyProjectsPage({ projects }: CompanyProjectsPageProps) {
           </ul>
         </article>
 
-        <article className="panel-card">
+        <article className="panel-card tone-orange">
           <SectionHeading
             eyebrow="Post a new brief"
             title="Got a new project ready?"
-            description="Use the posting form to draft a structured brief with all the context students need."
           />
-
-          <a className="button button-primary" href={routeHref('/company/post-project')}>
-            Post a project →
-          </a>
+          <p style={{ color: 'var(--ink-soft)', marginBottom: '0.5rem' }}>
+            Draft a scoped brief with budget, timeline, required skills, and deliverables.
+            Students can apply as soon as you publish.
+          </p>
+          <div className="list-stack">
+            {[
+              'Set a clear budget range and timeline before publishing',
+              'Specify required skills — this is the main filter students use',
+              'Include expected deliverables so applicants self-select correctly',
+            ].map((tip) => (
+              <article key={tip} className="list-card">
+                <strong>{tip}</strong>
+              </article>
+            ))}
+          </div>
+          <div className="hero-actions" style={{ marginTop: '0.75rem' }}>
+            <a className="button button-primary" href={routeHref('/company/post-project')}>
+              Post a project →
+            </a>
+          </div>
         </article>
       </section>
     </>

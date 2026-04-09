@@ -11,13 +11,13 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const uploadResume = asyncHandler(async (req: Request, res: Response) => {
-  if (!req.file) {
+  if (!(req as any).file) {
     const error: any = new Error("No file uploaded");
     error.status = 400;
     throw error;
   }
 
-  const fileUrl = `/uploads/${req.file.filename}`;
+  const fileUrl = `/uploads/${(req as any).file.filename}`;
   const profile = await StudentService.updateResumeUrl(
     (req as any).user.id,
     fileUrl,

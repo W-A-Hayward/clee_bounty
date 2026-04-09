@@ -17,15 +17,29 @@ type CompanyApplicantsPageProps = {
 
 function CompanyApplicantsPage({ projects, applicants }: CompanyApplicantsPageProps) {
   const [activeSlug, setActiveSlug] = useState<string>('all')
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, ApiCompanyApplicant['status']>>({})
+  const [declinedIds, setDeclinedIds] = useState<Set<string>>(new Set())
+
+  const updateStatus = (id: string, status: ApiCompanyApplicant['status']) => {
+    setStatusOverrides((prev) => ({ ...prev, [id]: status }))
+  }
+
+  const declineApplicant = (id: string) => {
+    setDeclinedIds((prev) => new Set([...prev, id]))
+  }
+
+  const effectiveApplicants = applicants
+    .filter((a) => !declinedIds.has(a.id))
+    .map((a) => ({ ...a, status: statusOverrides[a.id] ?? a.status }))
 
   const filteredApplicants =
     activeSlug === 'all'
-      ? applicants
-      : applicants.filter((a) => a.projectSlug === activeSlug)
+      ? effectiveApplicants
+      : effectiveApplicants.filter((a) => a.projectSlug === activeSlug)
 
-  const totalApplicants = applicants.length
-  const shortlisted = applicants.filter((a) => a.status === 'shortlisted' || a.status === 'interviewing' || a.status === 'accepted').length
-  const needsReview = applicants.filter((a) => a.status === 'submitted').length
+  const totalApplicants = effectiveApplicants.length
+  const shortlisted = effectiveApplicants.filter((a) => a.status === 'shortlisted' || a.status === 'interviewing' || a.status === 'accepted').length
+  const needsReview = effectiveApplicants.filter((a) => a.status === 'submitted').length
 
   return (
     <>
@@ -113,17 +127,17 @@ function CompanyApplicantsPage({ projects, applicants }: CompanyApplicantsPagePr
                 <div className="hero-actions">
                   {applicant.status === 'submitted' && (
                     <>
-                      <button className="button button-primary" type="button">
+                      <button className="button button-primary" onClick={() => updateStatus(applicant.id, 'shortlisted')} type="button">
                         Shortlist candidate
                       </button>
-                      <button className="button button-secondary" type="button">
+                      <button className="button button-secondary" onClick={() => declineApplicant(applicant.id)} type="button">
                         Decline
                       </button>
                     </>
                   )}
                   {applicant.status === 'shortlisted' && (
                     <>
-                      <button className="button button-primary" type="button">
+                      <button className="button button-primary" onClick={() => updateStatus(applicant.id, 'interviewing')} type="button">
                         Invite to interview
                       </button>
                       <a className="button button-secondary" href={routeHref('/company/messages')}>
@@ -133,7 +147,7 @@ function CompanyApplicantsPage({ projects, applicants }: CompanyApplicantsPagePr
                   )}
                   {applicant.status === 'interviewing' && (
                     <>
-                      <button className="button button-primary" type="button">
+                      <button className="button button-primary" onClick={() => updateStatus(applicant.id, 'accepted')} type="button">
                         Move to accepted
                       </button>
                       <a className="button button-secondary" href={routeHref('/company/messages')}>
@@ -151,9 +165,12 @@ function CompanyApplicantsPage({ projects, applicants }: CompanyApplicantsPagePr
             ))}
           </div>
         ) : (
-          <article className="panel-card">
-            <h2>No applicants on this project yet.</h2>
-            <p>Once the brief is live and candidates start applying, they will appear here.</p>
+          <article className="panel-card" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
+            <p className="eyebrow">No applicants yet</p>
+            <h2 style={{ margin: '0.5rem 0 0.75rem' }}>No applicants on this project yet.</h2>
+            <p style={{ color: 'var(--ink-soft)', maxWidth: '30rem', margin: '0 auto 1.5rem' }}>
+              Once your brief is live and candidates start applying, their profiles will appear here for review.
+            </p>
             <a className="button button-primary" href={routeHref('/company/post-project')}>
               Post a project
             </a>

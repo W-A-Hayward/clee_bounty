@@ -186,7 +186,23 @@ function DashboardPage({ session, projects, applications, messages }: DashboardP
               })}
             </div>
           ) : (
-            <p style={{ color: 'var(--ink-soft)' }}>Milestones will appear here after you are matched to a project.</p>
+            <div className="list-stack">
+              {[
+                { label: 'Submit application', desc: 'Apply to a project that matches your skills and availability.' },
+                { label: 'Get shortlisted', desc: 'Companies review and move strong applicants forward.' },
+                { label: 'Milestones unlock', desc: 'Once matched, deliverable stages appear here with due dates.' },
+              ].map((step) => (
+                <article key={step.label} className="list-card">
+                  <div>
+                    <strong>{step.label}</strong>
+                    <p>{step.desc}</p>
+                  </div>
+                </article>
+              ))}
+              <div className="hero-actions">
+                <a className="button button-primary" href={routeHref('/projects')}>Browse projects</a>
+              </div>
+            </div>
           )}
         </article>
       </section>

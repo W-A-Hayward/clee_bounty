@@ -1,4 +1,4 @@
-import type { DemoSession } from '../lib/demoSession'
+import type { CompanySession, DemoSession, MemberSession } from '../lib/demoSession'
 import { routeHref } from '../lib/hashRouter'
 
 type AuthPageProps = {
@@ -15,7 +15,7 @@ function AuthPage({ session = null }: AuthPageProps) {
         <div style={{ maxWidth: '38rem' }}>
           <p className="eyebrow">Account access</p>
           <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', lineHeight: 1.2, margin: '0.5rem 0 1rem' }}>
-            {session ? `Welcome back, ${session.role === 'company' ? (session as { companyName: string }).companyName : (session as { name: string }).name}.` : 'Sign in or create an account.'}
+            {session ? `Welcome back, ${session.role === 'company' ? (session as CompanySession).companyName : (session as MemberSession).name}.` : 'Sign in or create an account.'}
           </h1>
           <p className="page-intro" style={{ margin: 0 }}>
             {session

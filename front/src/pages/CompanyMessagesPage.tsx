@@ -40,9 +40,15 @@ function CompanyMessagesPage({ session, messages }: CompanyMessagesPageProps) {
           />
         </section>
         <section className="section-block">
-          <article className="panel-card">
+          <article className="panel-card" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
             <p className="eyebrow">No messages yet</p>
-            <p>Once students apply to your projects, conversation threads will appear here.</p>
+            <h2 style={{ margin: '0.5rem 0 0.75rem' }}>Conversations will appear once students apply.</h2>
+            <p style={{ color: 'var(--ink-soft)', maxWidth: '30rem', margin: '0 auto 1.5rem' }}>
+              When students submit applications to your live briefs, a message thread opens here so you can reply, share context, and advance the hiring process.
+            </p>
+            <a className="button button-primary" href="#/company/post-project">
+              Post a project
+            </a>
           </article>
         </section>
       </>
@@ -173,14 +179,14 @@ function CompanyMessagesPage({ session, messages }: CompanyMessagesPageProps) {
           />
 
           <div className="list-stack">
-            <article className="metric-card tone-blue" style={{ border: '1px solid var(--line)', borderRadius: '1rem', padding: '1rem' }}>
+            <article className="metric-card tone-blue">
               <strong>{messages.reduce((sum, m) => sum + m.unread, 0)}</strong>
               <div>
                 <span>unread messages</span>
                 <p>Applicants waiting on a reply from the company side.</p>
               </div>
             </article>
-            <article className="metric-card tone-green" style={{ border: '1px solid var(--line)', borderRadius: '1rem', padding: '1rem' }}>
+            <article className="metric-card tone-green">
               <strong>{messages.length}</strong>
               <div>
                 <span>active threads</span>

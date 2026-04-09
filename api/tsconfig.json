@@ -8,7 +8,7 @@
     "rewriteRelativeImportExtensions": true,
     "target": "es2022",
     "lib": ["es2023"],
-    "types": ["node"],
+    "types": ["node", "multer"],
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,

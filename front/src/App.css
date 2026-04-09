@@ -456,6 +456,19 @@
   color: var(--ink-strong);
 }
 
+.portal-profile-card strong {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.05;
+}
+
+.portal-profile-card p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .hero-spotlight p {
   margin: 0.9rem 0 1rem;
 }
@@ -1352,6 +1365,245 @@
   }
 }
 
+/* ── Page-header info-card: don't stretch to h1 height ───────────────────── */
+
+.page-header .info-card,
+.portal-hero .portal-profile-card {
+  min-height: 0;
+  align-self: start;
+}
+
+.info-card strong {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.15;
+}
+
+/* ── Panel-card heading scale ─────────────────────────────────────────────── */
+
+.panel-card .section-heading h2,
+.info-card .section-heading h2 {
+  font-size: clamp(1.3rem, 2.5vw, 1.85rem);
+  max-width: none;
+}
+
+/* In a narrow panel-card, the split heading becomes a single column */
+.panel-card .section-heading-split,
+.info-card .section-heading-split {
+  grid-template-columns: 1fr;
+}
+
+.panel-card .section-heading,
+.info-card .section-heading {
+  margin-bottom: 0.9rem;
+}
+
+.panel-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  line-height: 1.05;
+}
+
+/* ── List-card headings ───────────────────────────────────────────────────── */
+
+.list-card h2,
+.list-card h3 {
+  margin: 0 0 0.2rem;
+  color: var(--ink-strong);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.list-card-large h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.05;
+  margin-bottom: 0.3rem;
+}
+
+/* ── Status: accepted ─────────────────────────────────────────────────────── */
+
+.status-accepted {
+  color: #1a5e2e;
+  background: rgba(52, 168, 83, 0.16);
+}
+
+/* ── Interactive card transitions ─────────────────────────────────────────── */
+
+.project-card,
+.feature-card {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+  cursor: default;
+}
+
+.list-card,
+.message-preview {
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+a.list-card:hover,
+button.list-card:hover {
+  background: rgba(255, 255, 255, 0.84);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(89, 67, 31, 0.1);
+}
+
+.message-preview:hover {
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 64px rgba(89, 67, 31, 0.14);
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 48px rgba(89, 67, 31, 0.12);
+}
+
+/* ── Button polish ────────────────────────────────────────────────────────── */
+
+.button {
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+}
+
+/* ── Metric card number scale ─────────────────────────────────────────────── */
+
+.metric-card strong {
+  font-size: 2.7rem;
+}
+
+/* ── Portal hero separator ────────────────────────────────────────────────── */
+
+.portal-hero {
+  padding-bottom: clamp(1.25rem, 2.5vw, 2rem);
+  border-bottom: 1px solid var(--line);
+}
+
+/* ── Workspace: tighter section gaps ─────────────────────────────────────── */
+
+.workspace-main > .section-block {
+  margin-top: clamp(1.1rem, 2.5vw, 1.8rem);
+}
+
+.workspace-main > .section-block.portal-section-tight {
+  margin-top: clamp(0.75rem, 1.5vw, 1.1rem);
+}
+
+/* Reduce the gap between the page-header and first content section on public pages */
+.page-header + .section-block {
+  margin-top: clamp(1.8rem, 3.5vw, 2.75rem);
+}
+
+/* ── Form field hover/focus polish ───────────────────────────────────────── */
+
+.field-shell input,
+.field-shell select,
+.field-shell textarea,
+.search-shell input {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.field-shell input:hover:not(:disabled),
+.field-shell select:hover:not(:disabled),
+.field-shell textarea:hover:not(:disabled),
+.search-shell input:hover {
+  border-color: rgba(31, 95, 175, 0.3);
+}
+
+.field-shell input:disabled,
+.field-shell select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Thread stack max-height + bubble polish ─────────────────────────────── */
+
+.thread-stack {
+  max-height: 26rem;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 0.25rem;
+}
+
+.thread-bubble {
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
+.thread-bubble + .thread-bubble {
+  margin-top: 0.4rem;
+}
+
+/* ── Filter chip transitions ─────────────────────────────────────────────── */
+
+.filter-chip {
+  font-size: 0.87rem;
+  font-weight: 700;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.filter-chip:hover:not(.is-active) {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(31, 95, 175, 0.22);
+}
+
+/* ── Results bar ─────────────────────────────────────────────────────────── */
+
+.results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  font-size: 0.87rem;
+  color: var(--ink-soft);
+}
+
+/* ── Workspace footer ─────────────────────────────────────────────────────── */
+
+.workspace-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: clamp(2.5rem, 4vw, 4rem);
+  padding: 1.25rem 0 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.83rem;
+}
+
+.workspace-footer a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.workspace-footer a:hover {
+  color: var(--ink-strong);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .atmosphere,
   .hero-copy,
@@ -1364,7 +1616,15 @@
 
   .button,
   .site-links a,
-  .footer-links a {
+  .footer-links a,
+  .list-card,
+  .message-preview,
+  .project-card,
+  .feature-card,
+  .filter-chip,
+  .field-shell input,
+  .field-shell select,
+  .field-shell textarea {
     transition: none;
   }
 }

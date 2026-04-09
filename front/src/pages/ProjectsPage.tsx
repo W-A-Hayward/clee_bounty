@@ -2,6 +2,7 @@ import { useDeferredValue, useState } from 'react'
 import ProjectCard from '../components/ProjectCard'
 import SectionHeading from '../components/SectionHeading'
 import { marketplaceNotes, type StudentProject } from '../data/studentPortal'
+import { routeHref } from '../lib/hashRouter'
 
 const filters = ['All', 'Remote', 'Hybrid', 'React', 'Accessibility', 'Analytics', 'Design systems', 'UX writing']
 
@@ -30,9 +31,11 @@ function ProjectsPage({ projects }: ProjectsPageProps) {
   })
 
   const resultLabel = `${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}`
+  const isFiltered = activeFilter !== 'All' || query.trim() !== ''
 
   return (
     <>
+      {/* ── TOOLBAR ─────────────────────────────────────────────────── */}
       <section className="section-block portal-section-tight">
         <SectionHeading
           eyebrow="Project marketplace"
@@ -65,36 +68,24 @@ function ProjectsPage({ projects }: ProjectsPageProps) {
             ))}
           </div>
         </div>
-      </section>
 
-      <section className="section-block portal-two-column">
-        <article className="panel-card">
-          <div className="card-topline">
-            <span className="mini-label">Results</span>
+        <div className="results-bar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span className="status-pill status-live">{resultLabel}</span>
+            {isFiltered && (
+              <span>
+                {activeFilter !== 'All' ? activeFilter : ''}
+                {activeFilter !== 'All' && query.trim() ? ' · ' : ''}
+                {query.trim() ? `"${query.trim()}"` : ''}
+              </span>
+            )}
+            {!isFiltered && <span>All categories · all work modes</span>}
           </div>
-
-          <p className="page-intro">
-            Projects surface budget, duration, experience level, work mode, and a short scope
-            summary before you open the full brief.
-          </p>
-        </article>
-
-        <article className="panel-card">
-          <SectionHeading
-            eyebrow="How to read the board"
-            title="Good briefs reduce guesswork."
-            description="Use these cues to decide quickly whether a project deserves a real application."
-          />
-
-          <ul className="point-list">
-            {marketplaceNotes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        </article>
+          <span>Budget · duration · skills visible on every card</span>
+        </div>
       </section>
 
+      {/* ── PROJECT GRID ────────────────────────────────────────────── */}
       <section className="section-block">
         {filteredProjects.length > 0 ? (
           <div className="project-grid">
@@ -103,12 +94,59 @@ function ProjectsPage({ projects }: ProjectsPageProps) {
             ))}
           </div>
         ) : (
-          <article className="panel-card">
-            <h2>No matching projects yet.</h2>
-            <p>Try a broader search or switch back to `All` to review the full opportunity set.</p>
+          <article className="panel-card" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
+            <p className="eyebrow">No matches</p>
+            <h2 style={{ margin: '0.5rem 0 0.75rem' }}>No projects match your current filters.</h2>
+            <p style={{ color: 'var(--ink-soft)', maxWidth: '30rem', margin: '0 auto 1.5rem' }}>
+              Try a broader search term or switch back to "All" to see every live brief.
+            </p>
+            <button
+              className="button button-secondary"
+              onClick={() => { setQuery(''); setActiveFilter('All') }}
+              type="button"
+            >
+              Clear filters
+            </button>
           </article>
         )}
       </section>
+
+      {/* ── CONTEXT TIPS ────────────────────────────────────────────── */}
+      {filteredProjects.length > 0 && (
+        <section className="section-block portal-two-column">
+          <article className="panel-card">
+            <SectionHeading
+              eyebrow="How to read the board"
+              title="Good briefs reduce guesswork."
+            />
+            <div className="list-stack">
+              {marketplaceNotes.map((note) => (
+                <article key={note} className="list-card">
+                  <strong>{note}</strong>
+                </article>
+              ))}
+            </div>
+          </article>
+
+          <article className="panel-card tone-blue">
+            <SectionHeading
+              eyebrow="Ready to apply?"
+              title="Sign in to apply directly from the brief page."
+            />
+            <p style={{ color: 'var(--ink-soft)', marginBottom: '1.1rem' }}>
+              Create a free student account to submit targeted applications, track status, and message companies — all from one workspace.
+            </p>
+            <div className="hero-actions">
+              <a className="button button-primary" href={routeHref('/students/create-account')}>
+                Create student account
+              </a>
+              <a className="button button-secondary" href={routeHref('/students/sign-in')}>
+                Sign in
+              </a>
+            </div>
+          </article>
+        </section>
+      )}
     </>
   )
 }

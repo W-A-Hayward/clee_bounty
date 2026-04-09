@@ -59,7 +59,7 @@ function CompanyLayout({
         </div>
       </header>
 
-      <main>
+      <main className="workspace-main">
         <section className="portal-hero">
           <div>
             <p className="eyebrow">Company workspace</p>
@@ -101,6 +101,15 @@ function CompanyLayout({
         </section>
 
         {children}
+
+        <footer className="workspace-footer">
+          <span>© {new Date().getFullYear()} Clee — Student freelance marketplace</span>
+          <div style={{ display: 'flex', gap: '1.25rem' }}>
+            <a href="#/">Back to website</a>
+            <a href="#/projects">Browse projects</a>
+            <a href="#/how-it-works">How it works</a>
+          </div>
+        </footer>
       </main>
     </div>
   )

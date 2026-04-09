@@ -23,8 +23,8 @@ function StudentProfilePage({ session, onSave }: StudentProfilePageProps) {
   const [availability, setAvailability] = useState(session.availability)
   const [rate, setRate] = useState(session.rate)
   const [portfolio, setPortfolio] = useState(session.portfolioUrl)
-  const [github, setGithub] = useState('github.com/amira')
-  const [linkedin, setLinkedin] = useState('linkedin.com/in/amira-khan')
+  const [github, setGithub] = useState('')
+  const [linkedin, setLinkedin] = useState('')
   const [bio, setBio] = useState(
     'Product-minded frontend developer with a focus on clean interfaces and design systems. I work best on projects where implementation quality and design thinking overlap.',
   )
