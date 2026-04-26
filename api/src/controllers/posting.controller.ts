@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asyncHandler.ts";
 import * as PostingService from "../services/posting.service.ts";
 
-export const getPostings = asyncHandler(async (res: Response) => {
+export const getPostings = asyncHandler(async (_req: Request, res: Response) => {
   const postings = await PostingService.getPostings();
   res.status(200).json({ postings });
 });

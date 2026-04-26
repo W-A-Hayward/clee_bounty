@@ -1,381 +1,422 @@
-import ProjectCard from '../components/ProjectCard'
+import { useMemo } from 'react'
+import MagneticButton from '../components/MagneticButton'
+import ScrollReveal from '../components/ScrollReveal'
 import SectionHeading from '../components/SectionHeading'
+import TiltCard from '../components/TiltCard'
 import { companyProjects as staticCompanyProjects, type CompanyProject } from '../data/companyPortal'
 import { faqItems } from '../data/siteContent'
+import { useLang, pick } from '../i18n/LanguageContext'
 import type { StudentProject } from '../data/studentPortal'
 import type { DemoSession } from '../lib/demoSession'
 import { routeHref } from '../lib/hashRouter'
+import legendHeroImage from '../assets/legend-hero-image.png'
 
 type HomePageProps = {
   session?: DemoSession
   studentProjects: StudentProject[]
   companyProjects: CompanyProject[]
+  onOpenPalette: () => void
 }
 
-const steps = [
-  {
-    number: '01',
-    tone: 'step-number-blue',
-    title: 'Browse real projects',
-    body: 'Discover scoped freelance briefs with budget, timeline, work mode, and required skills visible before you click anything.',
+const copy = {
+  en: {
+    badge: (n: number) => `Live legend · ${n} open briefs`,
+    heroPre: 'Real work for',
+    heroWords: ['students.', 'designers.', 'engineers.', 'analysts.', 'writers.', 'researchers.'],
+    heroIntro: 'Put yourself on the map. Browse verified briefs, apply with context, and turn every project into a chapter of your portfolio.',
+    browseMarketplace: 'Browse the marketplace',
+    openCompanyDash: 'Open company dashboard',
+    openMyDash: 'Open my dashboard',
+    signIn: 'Sign in',
+    statsLive: 'Live briefs',
+    statsCompanies: 'Companies',
+    statsReply: 'Avg reply',
+    heroAlt: 'Legend opportunity map connecting Montreal campus nodes and company opportunities',
+    flowEyebrow: 'The flow',
+    flowTitle: 'Three motions. One workspace. Zero noise.',
+    flowDesc: 'Every map has a legend. This is yours: browse, apply, deliver, and keep the opportunity path clear on both sides.',
+    pillars: [
+      { counter: '01', title: 'Browse like a feed', body: 'Every brief carries scope, budget, timeline, deliverables, work mode, and required skills before you click. No teaser cards.' },
+      { counter: '02', title: 'Apply with sharp context', body: 'Your school identity, portfolio, availability and rate ride along. Companies receive a complete picture, not a CV blob.' },
+      { counter: '03', title: 'Deliver inside the platform', body: 'Milestones, threads, file handoff and reviews live in one workspace. Email scatter is replaced by structured stages.' },
+    ],
+    openNowEyebrow: 'Open right now',
+    openNowTitle: 'Briefs you can apply to today.',
+    openNowDesc: 'Each card carries scope, fit signal, and a direct route into the brief, and the apply form.',
+    viewAll: (n: number) => `View all ${n}`,
+    fitSuffix: 'fit',
+    openBrief: 'Open brief',
+    forStudentsKicker: 'For students',
+    forStudentsTitle: 'Browse the board.',
+    forStudentsTitleEm: ' Apply when it fits.',
+    forStudentsBody: 'Project briefs are public. No forced sign-up to read what is on the board. Sign in only when you are ready to apply or open your dashboard.',
+    forStudentsBullets: [
+      'Full scope, budget, deliverables visible upfront',
+      'Pipeline workspace, applications, messages, milestones',
+      'School-verified identity from day one',
+    ],
+    createStudent: 'Create student account',
+    learnMore: 'Learn more',
+    forCompaniesKicker: 'For companies',
+    forCompaniesTitle: 'Post structured work.',
+    forCompaniesTitleEm: ' Receive sharper applicants.',
+    forCompaniesBody: 'Write a structured brief once. Receive applications from students who already understand scope, budget, deliverables, and review cadence.',
+    postProject: 'Post a project',
+    applicantsLabel: 'applicants',
+    trustEyebrow: 'Why it works',
+    trustTitle: 'Identity, structure, moderation, engineered into the product.',
+    trustDesc: 'Both sides of the marketplace need to trust each other before a project can succeed. Trust is a product surface, not a slogan.',
+    trustPillars: [
+      { kicker: 'Identity', title: 'School-verified profiles, work-email companies', body: 'Every account carries a real-world signal, not just a username and password.' },
+      { kicker: 'Structure', title: 'Briefs hit a standard before they go live', body: 'Scope, deliverables, budget, timeline and review cadence are required fields, not optional.' },
+      { kicker: 'Moderation', title: 'Disputes & quality control are first-class surfaces', body: 'Platform governance is visible, not buried in fine print or ToS.' },
+    ],
+    faqEyebrow: 'FAQ',
+    faqTitle: 'What people ask before they get started.',
+    faqDesc: 'More detail lives on the how-it-works page, and inside the workspace once you sign in.',
+    ctaEyebrow: 'Step in',
+    ctaTitle: 'The marketplace is live. Walk in.',
+    ctaBody: 'Students get real portfolio work with verified companies. Companies receive structured output without recruiting overhead. The platform keeps both sides accountable.',
+    joinAsStudent: 'Join as student',
+    browseFirst: 'Browse first',
   },
-  {
-    number: '02',
-    tone: 'step-number-green',
-    title: 'Apply when the fit is clear',
-    body: 'Sign in as a student and submit a targeted application directly from the project brief page. Track it from your dashboard.',
+  fr: {
+    badge: (n: number) => `Légende en direct · ${n} mandats ouverts`,
+    heroPre: 'Du vrai travail pour',
+    heroWords: ['les étudiants.', 'les designers.', 'les développeurs.', 'les analystes.', 'les rédacteurs.', 'les chercheurs.'],
+    heroIntro: 'Trouve ta place sur la carte. Explore des mandats vérifiés, postule en contexte, et transforme chaque projet en chapitre de ton portfolio.',
+    browseMarketplace: 'Explorer les projets',
+    openCompanyDash: 'Ouvrir mon espace entreprise',
+    openMyDash: 'Mon tableau de bord',
+    signIn: 'Connexion',
+    statsLive: 'Mandats actifs',
+    statsCompanies: 'Entreprises',
+    statsReply: 'Réponse moy.',
+    heroAlt: 'Carte des opportunités Legend reliant les campus montréalais aux entreprises',
+    flowEyebrow: 'Le flow',
+    flowTitle: 'Trois mouvements. Un atelier. Zéro bruit.',
+    flowDesc: 'Chaque carte a sa légende. Voici la tienne : explore, postule, livre, et garde le chemin clair des deux côtés.',
+    pillars: [
+      { counter: '01', title: 'Explore comme un fil', body: 'Chaque mandat affiche scope, budget, échéance, livrables, mode de travail et compétences avant que tu cliques. Aucune carte teaser.' },
+      { counter: '02', title: 'Postule avec contexte', body: 'Ton identité étudiante, ton portfolio, ta disponibilité et ton taux suivent ta candidature. Les entreprises reçoivent un vrai portrait, pas un CV brut.' },
+      { counter: '03', title: 'Livre dans la plateforme', body: 'Étapes, fils de discussion, remise de fichiers et revues vivent dans un seul atelier. Fini les courriels éparpillés.' },
+    ],
+    openNowEyebrow: 'Ouvert maintenant',
+    openNowTitle: 'Des mandats où tu peux postuler aujourd’hui.',
+    openNowDesc: 'Chaque carte porte le scope, le signal d’adéquation, et un accès direct au mandat et au formulaire.',
+    viewAll: (n: number) => `Tout voir (${n})`,
+    fitSuffix: 'match',
+    openBrief: 'Voir le mandat',
+    forStudentsKicker: 'Pour les étudiants',
+    forStudentsTitle: 'Explore le tableau.',
+    forStudentsTitleEm: ' Postule quand ça colle.',
+    forStudentsBody: 'Les mandats sont publics. Pas besoin de créer un compte pour lire ce qui est affiché. Tu te connectes seulement pour postuler ou ouvrir ton tableau.',
+    forStudentsBullets: [
+      'Scope, budget, livrables visibles dès le départ',
+      'Atelier complet : candidatures, messages, étapes',
+      'Identité étudiante vérifiée dès le jour un',
+    ],
+    createStudent: 'Créer mon compte étudiant',
+    learnMore: 'En savoir plus',
+    forCompaniesKicker: 'Pour les entreprises',
+    forCompaniesTitle: 'Publiez du travail structuré.',
+    forCompaniesTitleEm: ' Recevez des candidats plus aiguisés.',
+    forCompaniesBody: 'Rédigez un mandat structuré une seule fois. Recevez des candidatures d’étudiants qui comprennent déjà le scope, le budget, les livrables et la cadence de révision.',
+    postProject: 'Publier un projet',
+    applicantsLabel: 'candidats',
+    trustEyebrow: 'Pourquoi ça marche',
+    trustTitle: 'Identité, structure, modération — intégrées au produit.',
+    trustDesc: 'Les deux côtés doivent se faire confiance avant qu’un projet réussisse. La confiance est une surface produit, pas un slogan.',
+    trustPillars: [
+      { kicker: 'Identité', title: 'Profils étudiants vérifiés, entreprises avec courriel pro', body: 'Chaque compte porte un signal réel, pas juste un nom d’utilisateur et un mot de passe.' },
+      { kicker: 'Structure', title: 'Les mandats atteignent un standard avant publication', body: 'Scope, livrables, budget, échéance, cadence de revue : champs obligatoires, pas optionnels.' },
+      { kicker: 'Modération', title: 'Litiges et qualité visibles dans le produit', body: 'La gouvernance de la plateforme est visible, pas enterrée dans les conditions d’utilisation.' },
+    ],
+    faqEyebrow: 'FAQ',
+    faqTitle: 'Ce qu’on demande avant de commencer.',
+    faqDesc: 'Plus de détails sur la page « Comment ça marche », et dans l’atelier une fois connecté.',
+    ctaEyebrow: 'Entre',
+    ctaTitle: 'La plateforme est en direct. Entre.',
+    ctaBody: 'Les étudiants obtiennent du vrai travail portfolio avec des entreprises vérifiées. Les entreprises reçoivent une sortie structurée sans coût de recrutement. La plateforme garde les deux côtés responsables.',
+    joinAsStudent: 'Rejoindre comme étudiant',
+    browseFirst: 'Explorer d’abord',
   },
-  {
-    number: '03',
-    tone: 'step-number-orange',
-    title: 'Deliver with structure',
-    body: 'Milestones, messages, and deliverables keep the collaboration clean — no scattered email chains or vague feedback loops.',
-  },
-]
+}
 
 function HomePage({ session = null, studentProjects, companyProjects }: HomePageProps) {
+  const lang = useLang()
+  const t = copy[lang]
   const dashboardRoute = session?.role === 'company' ? '/company/dashboard' : '/dashboard'
   const dashboardCtaRoute = session ? dashboardRoute : '/auth'
   const dashboardLabel = session
     ? session.role === 'company'
-      ? 'Company dashboard'
-      : 'My dashboard'
-    : 'Sign in'
-  const uniqueCompanies = [...new Set(studentProjects.map((p) => p.company))].slice(0, 5)
-  const featuredProject = studentProjects[0]
+      ? t.openCompanyDash
+      : t.openMyDash
+    : t.signIn
+
   const previewProjects = studentProjects.slice(0, 3)
   const displayedFaqItems = faqItems.slice(0, 6)
   const displayedCompanyProjects = companyProjects.length > 0 ? companyProjects : staticCompanyProjects
+  const uniqueCompanies = useMemo(
+    () => Array.from(new Set(studentProjects.map((p) => p.company))),
+    [studentProjects],
+  )
+  const marqueeCompanies = uniqueCompanies.length > 0 ? uniqueCompanies : ['Legend', 'Northline', 'Harbor Foods']
 
   return (
-    <>
-      {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="hero-section">
-        <div className="hero-copy">
-          <p className="eyebrow">Student freelance marketplace</p>
-          <h1>Real projects. Real budgets. Real portfolio work.</h1>
-          <p className="hero-lead">
-            Students browse scoped freelance opportunities from verified companies — with budget,
-            timeline, and deliverables visible upfront. Apply when it fits, deliver with structure.
-          </p>
+    <div className="home-page">
+      <section className="clee-hero">
+        <div className="clee-hero-copy">
+          <span className="clee-hero-badge">
+            <span aria-hidden="true" />
+            {t.badge(studentProjects.length)}
+          </span>
 
-          <div className="hero-actions">
-            <a className="button button-primary" href={routeHref('/projects')}>
-              Browse projects
-            </a>
-            <a className="button button-secondary" href={routeHref('/companies/create-account')}>
-              Post a project
-            </a>
-            <a className="button button-ghost" href={routeHref('/students')}>
-              For students
-            </a>
-            <a className="button button-ghost" href={routeHref(dashboardCtaRoute)}>
+          <h1 className="clee-hero-title">
+            <span>{t.heroPre}</span>
+            <span className="clee-word-reel" aria-label={t.heroWords.join(', ')}>
+              <span>
+                {t.heroWords.map((word) => (
+                  <em key={word}>{word}</em>
+                ))}
+              </span>
+            </span>
+          </h1>
+
+          <p>{t.heroIntro}</p>
+
+          <div className="clee-hero-actions">
+            <MagneticButton className="button button-primary" href={routeHref('/projects')}>
+              {t.browseMarketplace}
+            </MagneticButton>
+            <MagneticButton className="button button-secondary" href={routeHref(dashboardCtaRoute)}>
               {dashboardLabel}
-            </a>
+            </MagneticButton>
           </div>
 
-          <div className="metrics-grid">
-            <article className="metric-card tone-blue">
+          <div className="clee-hero-stats">
+            <div>
               <strong>{studentProjects.length}</strong>
-              <div>
-                <span>live projects</span>
-                <p>Scoped briefs across design, analytics, frontend, and content.</p>
-              </div>
-            </article>
-            <article className="metric-card tone-green">
-              <strong>{uniqueCompanies.length}+</strong>
-              <div>
-                <span>active companies</span>
-                <p>Verified businesses posting real scoped work with clear budgets.</p>
-              </div>
-            </article>
-            <article className="metric-card tone-orange">
+              <span>{t.statsLive}</span>
+            </div>
+            <div>
+              <strong>{uniqueCompanies.length}</strong>
+              <span>{t.statsCompanies}</span>
+            </div>
+            <div>
               <strong>36h</strong>
-              <div>
-                <span>avg first reply</span>
-                <p>Companies commit to response timing before going live on the board.</p>
-              </div>
-            </article>
+              <span>{t.statsReply}</span>
+            </div>
           </div>
         </div>
 
-        <div className="hero-stage">
-          {featuredProject && (
-            <article className={`hero-spotlight ${featuredProject.tone}`}>
-              <div className="card-topline">
-                <span className="mini-label">Featured project</span>
-                <span className="status-pill status-live">{featuredProject.workMode}</span>
-              </div>
-              <h2>{featuredProject.title}</h2>
-              <p>{featuredProject.summary}</p>
-              <div className="project-card-meta">
-                <span>{featuredProject.company}</span>
-                <span>{featuredProject.budget}</span>
-                <span>{featuredProject.duration}</span>
-                <span>{featuredProject.deadlineLabel}</span>
-              </div>
-              <div className="tag-row">
-                {featuredProject.skills.map((skill) => (
-                  <span key={skill}>{skill}</span>
-                ))}
-              </div>
-              <a
-                className="button button-secondary"
-                href={routeHref(`/projects/${featuredProject.slug}`)}
-              >
-                View full brief
-              </a>
-            </article>
-          )}
+        <div className="clee-hero-visual">
+          <img
+            className="clee-hero-image"
+            src={legendHeroImage}
+            alt={t.heroAlt}
+          />
+        </div>
+      </section>
 
-          <article className="hero-note tone-green">
-            <span className="mini-label">Companies already posting</span>
-            <div className="tag-row" style={{ marginBottom: '0.6rem' }}>
-              {uniqueCompanies.map((company) => (
-                <span key={company}>{company}</span>
+      <ScrollReveal>
+        <section className="section-block home-section portal-section-tight">
+          <div className="marquee" aria-hidden>
+            <div className="marquee-track">
+              {[...marqueeCompanies, ...marqueeCompanies, ...marqueeCompanies].slice(0, 24).map((company, idx) => (
+                <span key={`${company}-${idx}`} className="marquee-item">{company}</span>
               ))}
             </div>
-            <p>
-              Browse the board first. Sign in when you are ready to apply. If you are a company,
-              create an account and publish your first brief today.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      {/* ── HIGHLIGHT BAR ────────────────────────────────────────── */}
-      <div className="highlight-bar" style={{ margin: '0.5rem 0 0' }}>
-        <span className="highlight-bar-dot dot-blue" />
-        <span className="mini-label" style={{ margin: 0, color: 'var(--ink-strong)' }}>
-          100% structured briefs
-        </span>
-        <span style={{ color: 'var(--ink-soft)', fontSize: '0.88rem' }}>
-          Every project includes scope, budget, timeline, and skills before going live.
-        </span>
-        <span className="highlight-bar-dot dot-green" style={{ marginLeft: 'auto' }} />
-        <span className="mini-label" style={{ margin: 0, color: 'var(--ink-strong)' }}>
-          School-verified students
-        </span>
-        <span style={{ color: 'var(--ink-soft)', fontSize: '0.88rem' }}>
-          Profiles carry real identity signal.
-        </span>
-        <span className="highlight-bar-dot dot-orange" />
-        <span className="mini-label" style={{ margin: 0, color: 'var(--ink-strong)' }}>
-          Milestone-based delivery
-        </span>
-        <span style={{ color: 'var(--ink-soft)', fontSize: '0.88rem' }}>
-          Work moves in stages, not vague promises.
-        </span>
-      </div>
-
-      {/* ── FRESH PROJECTS ───────────────────────────────────────── */}
-      <section className="section-block">
-        <SectionHeading
-          eyebrow="Open opportunities"
-          title="Fresh freelance briefs on the platform."
-          description="Explore budget, duration, work mode, and skill fit before you open a single brief page."
-        />
-
-        <div className="project-grid">
-          {previewProjects.map((project) => (
-            <ProjectCard key={project.slug} project={project} />
-          ))}
-        </div>
-
-        <div className="hero-actions" style={{ marginTop: '1.5rem' }}>
-          <a className="button button-primary" href={routeHref('/projects')}>
-            See all {studentProjects.length} projects
-          </a>
-          <a className="button button-secondary" href={routeHref('/how-it-works')}>
-            How it works
-          </a>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS (3 steps) ───────────────────────────────── */}
-      <section className="section-block">
-        <SectionHeading
-          eyebrow="Simple flow"
-          title="Browse, apply, deliver — three clean steps."
-          description="The platform is designed around real work, not vague gig listings. Every stage has a dedicated surface."
-        />
-
-        <div className="steps-grid">
-          {steps.map((step) => (
-            <article key={step.number} className="step-card">
-              <span className={`step-number ${step.tone}`}>{step.number}</span>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* ── FOR STUDENTS / FOR COMPANIES ─────────────────────────── */}
-      <section className="section-block portal-two-column">
-        <article className="panel-card tone-green">
-          <SectionHeading
-            eyebrow="For students"
-            title="Browse first, apply when it fits."
-            description="Project briefs are public. No forced sign-up just to see what is on the board."
-          />
-
-          <div className="list-stack">
-            <article className="list-card">
-              <div>
-                <strong>Full brief context upfront</strong>
-                <p>See company, budget, timeline, work mode, and required skills before applying.</p>
-              </div>
-            </article>
-            <article className="list-card">
-              <div>
-                <strong>Dashboard, applications, messages</strong>
-                <p>
-                  Sign in once and manage your entire freelance pipeline from one workspace.
-                </p>
-              </div>
-            </article>
-            <article className="list-card">
-              <div>
-                <strong>School-verified profile</strong>
-                <p>
-                  Your school identity gives companies more trust in your application from day one.
-                </p>
-              </div>
-            </article>
           </div>
+        </section>
+      </ScrollReveal>
 
-          <div className="hero-actions">
-            <a className="button button-primary" href={routeHref('/students/create-account')}>
-              Create student account
-            </a>
-            <a className="button button-secondary" href={routeHref('/students')}>
-              Learn more
-            </a>
-          </div>
-        </article>
-
-        <article className="panel-card tone-blue">
+      <section className="section-block home-section home-flow-section">
+        <ScrollReveal>
           <SectionHeading
-            eyebrow="For companies"
-            title="Post scoped work, get better applicants."
-            description="Write a structured brief once. Receive applications from students who already understand what you need."
+            eyebrow={t.flowEyebrow}
+            title={t.flowTitle}
+            description={t.flowDesc}
           />
+        </ScrollReveal>
 
-          <div className="list-stack">
-            {displayedCompanyProjects.slice(0, 2).map((project) => (
-              <article key={project.id} className={`list-card ${project.tone}`}>
-                <div>
-                  <strong>{project.title}</strong>
-                  <p>
-                    {project.projectType} / {project.budget} / {project.workMode}
-                  </p>
-                </div>
-                <div className="status-column">
-                  <span className={`status-pill status-${project.status}`}>{project.status}</span>
-                  <small>{project.applicants} applicants</small>
-                </div>
+        <div className="kinetic-pillars home-flow-grid">
+          {t.pillars.map((pillar, idx) => (
+            <ScrollReveal className="home-flow-reveal" key={pillar.counter} delay={idx * 0.1}>
+              <article className="kinetic-pillar">
+                <div className="kinetic-pillar-counter">{pillar.counter}</div>
+                <h3>{pillar.title}</h3>
+                <p>{pillar.body}</p>
               </article>
-            ))}
-          </div>
-
-          <div className="hero-actions">
-            <a className="button button-primary" href={routeHref('/companies/create-account')}>
-              Create company account
-            </a>
-            <a className="button button-secondary" href={routeHref('/companies')}>
-              Learn more
-            </a>
-          </div>
-        </article>
+            </ScrollReveal>
+          ))}
+        </div>
       </section>
 
-      {/* ── TRUST SIGNALS ────────────────────────────────────────── */}
-      <section className="section-block">
-        <SectionHeading
-          eyebrow="Built on trust"
-          title="Identity, structure, and moderation built in from day one."
-          description="Both sides of the marketplace need to trust each other before a project can succeed."
-        />
+      <section className="section-block home-section home-project-section">
+        <ScrollReveal>
+          <div className="home-section-toolbar">
+            <SectionHeading
+              eyebrow={t.openNowEyebrow}
+              title={t.openNowTitle}
+              description={t.openNowDesc}
+            />
+            <a className="button button-ghost" href={routeHref('/projects')}>
+              {t.viewAll(studentProjects.length)}
+            </a>
+          </div>
+        </ScrollReveal>
+
+        <div className="project-grid home-project-grid">
+          {previewProjects.map((project, idx) => (
+            <ScrollReveal className="home-project-reveal" key={project.slug} delay={idx * 0.08}>
+              <TiltCard className={`project-card ${project.tone}`} href={routeHref(`/projects/${project.slug}`)}>
+                <div className="project-card-topline">
+                  <span className="card-kicker">{project.company}</span>
+                  <span className="meta-chip">{pick(project.workMode, lang)}</span>
+                </div>
+                <h3>{pick(project.title, lang)}</h3>
+                <p>{pick(project.summary, lang)}</p>
+                <div className="project-card-meta">
+                  <span>{project.budget}</span>
+                  <span>{pick(project.duration, lang)}</span>
+                  <span>{pick(project.experienceLevel, lang)}</span>
+                </div>
+                <div className="tag-row">
+                  {project.skills.slice(0, 4).map((skill) => (
+                    <span key={skill}>{skill}</span>
+                  ))}
+                </div>
+                <div className="project-card-footer">
+                  <div className="project-card-fit">
+                    <strong>{project.matchScore}%</strong>
+                    <small>{t.fitSuffix}</small>
+                  </div>
+                  <span className="project-card-cta">{t.openBrief}</span>
+                </div>
+              </TiltCard>
+            </ScrollReveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-block home-section dual-channel">
+        <ScrollReveal>
+          <article className="dual-channel-card tone-green">
+            <span className="card-kicker">{t.forStudentsKicker}</span>
+            <h2 className="dual-channel-title">
+              {t.forStudentsTitle}
+              <em>{t.forStudentsTitleEm}</em>
+            </h2>
+            <p>{t.forStudentsBody}</p>
+            <ul className="point-list">
+              {t.forStudentsBullets.map((b) => <li key={b}>{b}</li>)}
+            </ul>
+            <div className="hero-actions">
+              <MagneticButton className="button button-primary" href={routeHref('/students/create-account')}>
+                {t.createStudent}
+              </MagneticButton>
+              <a className="button button-ghost" href={routeHref('/students')}>{t.learnMore}</a>
+            </div>
+          </article>
+        </ScrollReveal>
+
+        <ScrollReveal delay={0.1}>
+          <article className="dual-channel-card tone-blue">
+            <span className="card-kicker">{t.forCompaniesKicker}</span>
+            <h2 className="dual-channel-title">
+              {t.forCompaniesTitle}
+              <em>{t.forCompaniesTitleEm}</em>
+            </h2>
+            <p>{t.forCompaniesBody}</p>
+            <div className="list-stack">
+              {displayedCompanyProjects.slice(0, 2).map((project) => (
+                <article key={project.id} className="list-card">
+                  <div>
+                    <strong>{pick(project.title, lang)}</strong>
+                    <p>{pick(project.projectType, lang)} · {project.budget} · {pick(project.workMode, lang)}</p>
+                  </div>
+                  <div className="status-column">
+                    <span className={`status-pill status-${project.status}`}>{pick(project.statusLabel, lang)}</span>
+                    <small>{project.applicants} {t.applicantsLabel}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="hero-actions">
+              <MagneticButton className="button button-primary" href={routeHref('/companies/create-account')}>
+                {t.postProject}
+              </MagneticButton>
+              <a className="button button-ghost" href={routeHref('/companies')}>{t.learnMore}</a>
+            </div>
+          </article>
+        </ScrollReveal>
+      </section>
+
+      <section className="section-block home-section">
+        <ScrollReveal>
+          <SectionHeading
+            eyebrow={t.trustEyebrow}
+            title={t.trustTitle}
+            description={t.trustDesc}
+          />
+        </ScrollReveal>
 
         <div className="feature-grid feature-grid-three">
-          <article className="feature-card tone-blue">
-            <span className="card-kicker">Identity</span>
-            <h3>School-verified students, work-email verified companies</h3>
-            <p>
-              Every account uses a real identity signal — not just a username and password.
-            </p>
-          </article>
-          <article className="feature-card tone-green">
-            <span className="card-kicker">Structure</span>
-            <h3>Every brief passes a standard before going live</h3>
-            <p>
-              Scope, deliverables, budget, timeline, and review cadence are required — not optional
-              extras.
-            </p>
-          </article>
-          <article className="feature-card tone-orange">
-            <span className="card-kicker">Moderation</span>
-            <h3>Disputes, verification, and quality control are real product surfaces</h3>
-            <p>
-              Platform governance is visible and designed in, not buried in fine print.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      {/* ── FAQ ──────────────────────────────────────────────────── */}
-      <section className="section-block">
-        <SectionHeading
-          eyebrow="Common questions"
-          title="What people ask before they get started."
-          description="More detail is available on the how it works page, the for students page, and the for companies page."
-        />
-
-        <div className="faq-grid">
-          {displayedFaqItems.map((item) => (
-            <article key={item.question} className="faq-item">
-              <h3>{item.question}</h3>
-              <p>{item.answer}</p>
-            </article>
+          {t.trustPillars.map((pillar, idx) => (
+            <ScrollReveal key={pillar.kicker} delay={idx * 0.08}>
+              <article className="trust-pillar">
+                <span className="card-kicker">{pillar.kicker}</span>
+                <h3>{pillar.title}</h3>
+                <p>{pillar.body}</p>
+              </article>
+            </ScrollReveal>
           ))}
         </div>
+      </section>
 
-        <div className="hero-actions" style={{ marginTop: '1.5rem' }}>
-          <a className="button button-secondary" href={routeHref('/how-it-works')}>
-            Full platform overview
-          </a>
-          <a className="button button-ghost" href={routeHref('/about')}>
-            About Clee
-          </a>
+      <section className="section-block home-section">
+        <ScrollReveal>
+          <SectionHeading
+            eyebrow={t.faqEyebrow}
+            title={t.faqTitle}
+            description={t.faqDesc}
+          />
+        </ScrollReveal>
+
+        <div className="faq-grid">
+          {displayedFaqItems.map((item, idx) => (
+            <ScrollReveal key={pick(item.question, 'en')} delay={idx * 0.05}>
+              <article className="faq-item">
+                <h3>{pick(item.question, lang)}</h3>
+                <p>{pick(item.answer, lang)}</p>
+              </article>
+            </ScrollReveal>
+          ))}
         </div>
       </section>
 
-      {/* ── CTA PANEL ────────────────────────────────────────────── */}
-      <section className="section-block">
-        <div className="cta-panel-full">
-          <div>
-            <p className="eyebrow">Ready to start?</p>
-            <h2>Join the marketplace that takes freelance work seriously.</h2>
-            <p>
-              Students get real portfolio work with verified companies. Companies get structured
-              output without recruiting overhead. The platform keeps both sides accountable.
-            </p>
+      <section className="cta-section">
+        <ScrollReveal>
+          <div className="cta-panel-full">
+            <div>
+              <p className="eyebrow">{t.ctaEyebrow}</p>
+              <h2>{t.ctaTitle}</h2>
+              <p>{t.ctaBody}</p>
+            </div>
+            <div className="cta-panel-actions">
+              <MagneticButton className="button button-primary" href={routeHref('/students/create-account')}>
+                {t.joinAsStudent}
+              </MagneticButton>
+              <MagneticButton className="button button-secondary" href={routeHref('/companies/create-account')}>
+                {t.postProject}
+              </MagneticButton>
+              <a className="button button-ghost" href={routeHref('/projects')}>{t.browseFirst}</a>
+            </div>
           </div>
-          <div className="cta-panel-actions">
-            <a className="button button-primary" href={routeHref('/students/create-account')}>
-              Create student account
-            </a>
-            <a className="button button-secondary" href={routeHref('/companies/create-account')}>
-              Post a project
-            </a>
-            <a className="button button-ghost" href={routeHref('/projects')}>
-              Browse first
-            </a>
-          </div>
-        </div>
+        </ScrollReveal>
       </section>
-    </>
+    </div>
   )
 }
 

@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
+import { useLang } from '../i18n/LanguageContext'
 import type { MemberSession } from '../lib/demoSession'
+import LanguageToggle from './LanguageToggle'
 import NavLink from './NavLink'
 
 type WorkspaceLayoutProps = {
@@ -11,6 +13,37 @@ type WorkspaceLayoutProps = {
   children: ReactNode
 }
 
+const copy = {
+  en: {
+    skip: 'Skip to main content',
+    nav: {
+      dashboard: 'Dashboard',
+      projects: 'Projects',
+      applications: 'Applications',
+      messages: 'Messages',
+      profile: 'Profile',
+    },
+    backToSite: 'Back to website',
+    logOut: 'Log out',
+    eyebrow: 'Student workspace',
+    yourProfile: 'Your profile',
+  },
+  fr: {
+    skip: 'Aller au contenu principal',
+    nav: {
+      dashboard: 'Tableau de bord',
+      projects: 'Projets',
+      applications: 'Candidatures',
+      messages: 'Messages',
+      profile: 'Profil',
+    },
+    backToSite: 'Retour au site',
+    logOut: 'Déconnexion',
+    eyebrow: 'Atelier étudiant',
+    yourProfile: 'Ton profil',
+  },
+}
+
 function WorkspaceLayout({
   currentPath,
   session,
@@ -19,8 +52,13 @@ function WorkspaceLayout({
   onSignOut,
   children,
 }: WorkspaceLayoutProps) {
+  const lang = useLang()
+  const t = copy[lang]
   return (
     <div className="site-shell">
+      <a className="skip-link" href="#main-content">
+        {t.skip}
+      </a>
       <div className="atmosphere atmosphere-blue" />
       <div className="atmosphere atmosphere-green" />
       <div className="atmosphere atmosphere-orange" />
@@ -28,9 +66,9 @@ function WorkspaceLayout({
       <header className="site-nav workspace-nav">
         <div className="workspace-brand-group">
           <a className="brandmark" href="#/dashboard">
-            <span className="brandmark-icon">C</span>
+            <span className="brandmark-icon">L</span>
             <span className="brandmark-copy">
-              <strong>Clee</strong>
+              <strong>Legend</strong>
               <small>{session.name}</small>
             </span>
           </a>
@@ -42,33 +80,34 @@ function WorkspaceLayout({
         </div>
 
         <nav aria-label="Workspace" className="site-links workspace-links">
-          <NavLink className="nav-link" currentPath={currentPath} label="Dashboard" to="/dashboard" />
-          <NavLink className="nav-link" currentPath={currentPath} label="Projects" to="/projects" />
-          <NavLink className="nav-link" currentPath={currentPath} label="Applications" to="/applications" />
-          <NavLink className="nav-link" currentPath={currentPath} label="Messages" to="/messages" />
-          <NavLink className="nav-link" currentPath={currentPath} label="Profile" to="/profile" />
+          <NavLink className="nav-link" currentPath={currentPath} label={t.nav.dashboard} to="/dashboard" />
+          <NavLink className="nav-link" currentPath={currentPath} label={t.nav.projects} to="/projects" />
+          <NavLink className="nav-link" currentPath={currentPath} label={t.nav.applications} to="/applications" />
+          <NavLink className="nav-link" currentPath={currentPath} label={t.nav.messages} to="/messages" />
+          <NavLink className="nav-link" currentPath={currentPath} label={t.nav.profile} to="/profile" />
         </nav>
 
         <div className="site-actions">
+          <LanguageToggle />
           <a className="button button-secondary" href="#/">
-            Back to website
+            {t.backToSite}
           </a>
           <button className="button button-ghost" onClick={onSignOut} type="button">
-            Log out
+            {t.logOut}
           </button>
         </div>
       </header>
 
-      <main>
+      <main id="main-content">
         <section className="portal-hero">
           <div>
-            <p className="eyebrow">Student workspace</p>
+            <p className="eyebrow">{t.eyebrow}</p>
             <h1>{title}</h1>
             <p className="page-intro">{subtitle}</p>
           </div>
 
           <div className="portal-profile-card tone-green">
-            <span className="mini-label">Your profile</span>
+            <span className="mini-label">{t.yourProfile}</span>
             <strong>{session.name}</strong>
             <p>
               {session.school} · {session.program}

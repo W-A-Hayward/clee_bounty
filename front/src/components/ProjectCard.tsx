@@ -1,26 +1,34 @@
 import type { StudentProject } from '../data/studentPortal'
+import { pick, useLang } from '../i18n/LanguageContext'
 import { routeHref } from '../lib/hashRouter'
 
 type ProjectCardProps = {
   project: StudentProject
 }
 
+const copy = {
+  en: { match: 'match', viewBrief: 'View full brief' },
+  fr: { match: 'match', viewBrief: 'Voir le mandat complet' },
+}
+
 function ProjectCard({ project }: ProjectCardProps) {
+  const lang = useLang()
+  const t = copy[lang]
   return (
     <article className={`project-card ${project.tone}`}>
       <div className="project-card-topline">
         <span className="card-kicker">{project.company}</span>
-        <span className="meta-chip">{project.workMode}</span>
+        <span className="meta-chip">{pick(project.workMode, lang)}</span>
       </div>
 
-      <h3>{project.title}</h3>
-      <p>{project.summary}</p>
+      <h3>{pick(project.title, lang)}</h3>
+      <p>{pick(project.summary, lang)}</p>
 
       <div className="project-card-meta">
         <span>{project.budget}</span>
-        <span>{project.duration}</span>
-        <span>{project.experienceLevel}</span>
-        <span>{project.deadlineLabel}</span>
+        <span>{pick(project.duration, lang)}</span>
+        <span>{pick(project.experienceLevel, lang)}</span>
+        <span>{pick(project.deadlineLabel, lang)}</span>
       </div>
 
       <div className="tag-row">
@@ -32,11 +40,11 @@ function ProjectCard({ project }: ProjectCardProps) {
       <div className="project-card-footer">
         <div className="project-card-fit">
           <strong>{project.matchScore}%</strong>
-          <small>match</small>
+          <small>{t.match}</small>
         </div>
 
         <a className="button button-secondary" href={routeHref(`/projects/${project.slug}`)}>
-          View full brief
+          {t.viewBrief}
         </a>
       </div>
     </article>

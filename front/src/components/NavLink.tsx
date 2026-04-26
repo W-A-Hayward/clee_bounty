@@ -14,6 +14,7 @@ function NavLink({ className = '', currentPath, label, to, exact = false, ...pro
   return (
     <a
       {...props}
+      aria-current={isActive ? 'page' : undefined}
       className={`${className}${isActive ? ' is-active' : ''}`.trim()}
       href={routeHref(to)}
     >

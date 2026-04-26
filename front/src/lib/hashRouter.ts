@@ -22,7 +22,7 @@ export function useHashPath() {
   useEffect(() => {
     const syncPath = () => {
       setPath(normalizeHashPath(window.location.hash))
-      window.scrollTo({ top: 0 })
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
     }
 
     if (!window.location.hash) {

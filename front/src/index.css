@@ -1,29 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --canvas: #efe3cf;
-  --canvas-deep: #e6d4b8;
-  --surface: rgba(250, 243, 230, 0.88);
-  --paper: #fffaf1;
-  --line: rgba(65, 56, 44, 0.12);
-  --ink-strong: #18212b;
-  --ink-soft: #5f5a52;
-  --brand-blue: #1f5faf;
-  --brand-green: #8cc63f;
-  --brand-orange: #f7941d;
-  --signal-red: #e11d2f;
-  --font-body: 'Manrope', 'Avenir Next', sans-serif;
+  /* ─── The four colors ──────────────────────────── */
+  --clay: #a47251;
+  --clay-deep: #7e5538;
+  --clay-soft: rgba(164, 114, 81, 0.16);
+  --honey: #dd9e59;
+  --honey-deep: #b27c3a;
+  --honey-soft: rgba(221, 158, 89, 0.18);
+  --sand: #f0d8a1;
+  --sand-deep: #e6c581;
+  --sand-light: #faecbf;
+  --sage: #dcf0c3;
+  --sage-deep: #7fa850;
+  --sage-soft: rgba(220, 240, 195, 0.5);
+
+  /* ─── Surfaces ─────────────────────────────────── */
+  --canvas: #f0d8a1;
+  --canvas-deep: #e6c581;
+  --canvas-up: #f7e6c0;
+  --paper: #fffaf0;
+  --surface: rgba(255, 250, 240, 0.65);
+  --surface-strong: rgba(255, 250, 240, 0.85);
+  --surface-hover: rgba(255, 250, 240, 0.95);
+
+  /* ─── Hairlines & borders ──────────────────────── */
+  --border: rgba(74, 45, 26, 0.14);
+  --border-strong: rgba(74, 45, 26, 0.32);
+  --border-accent: rgba(164, 114, 81, 0.38);
+
+  /* ─── Ink ──────────────────────────────────────── */
+  --ink-strong: #2a1a0e;
+  --ink: #3d291a;
+  --ink-soft: #6e4a32;
+  --ink-faded: #946d4d;
+  --ink-mute: #b89372;
+
+  /* ─── Accent aliases (system-wide) ─────────────── */
+  --accent-lime: var(--clay);
+  --accent-lime-deep: var(--clay-deep);
+  --accent-lime-soft: var(--clay-soft);
+  --accent-sky: var(--sage-deep);
+  --accent-sky-deep: #5e8338;
+  --accent-sky-soft: var(--sage-soft);
+  --accent-amber: var(--honey);
+  --accent-amber-deep: var(--honey-deep);
+  --accent-amber-soft: var(--honey-soft);
+  --accent-rose: #c14a3d;
+  --accent-rose-soft: rgba(193, 74, 61, 0.14);
+
+  /* ─── Legacy compat (inline styles in older pages) ─ */
+  --brand-blue: var(--clay);
+  --brand-blue-deep: var(--clay-deep);
+  --brand-blue-soft: var(--clay-soft);
+  --brand-green: var(--sage-deep);
+  --brand-green-deep: #5e8338;
+  --brand-green-soft: var(--sage-soft);
+  --brand-orange: var(--honey);
+  --brand-orange-deep: var(--honey-deep);
+  --brand-orange-soft: var(--honey-soft);
+  --signal-red: var(--accent-rose);
+  --signal-red-soft: var(--accent-rose-soft);
+  --line: var(--border);
+  --line-strong: var(--border-strong);
+
+  /* ─── Tokens ───────────────────────────────────── */
+  --shadow-sm: 0 4px 12px rgba(74, 45, 26, 0.08);
+  --shadow-md: 0 14px 40px rgba(74, 45, 26, 0.13);
+  --shadow-lg: 0 24px 60px rgba(74, 45, 26, 0.2);
+  --shadow-glow-clay: 0 16px 40px rgba(164, 114, 81, 0.28);
+  --shadow-glow-honey: 0 16px 40px rgba(221, 158, 89, 0.32);
+  --shadow-glow-sage: 0 16px 40px rgba(127, 168, 80, 0.22);
+  /* legacy aliases */
+  --shadow-glow-lime: var(--shadow-glow-clay);
+  --shadow-glow-sky: var(--shadow-glow-sage);
+
+  --radius-xs: 0.35rem;
+  --radius-sm: 0.6rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+
+  /* ─── Type ─────────────────────────────────────── */
   --font-display: 'Fraunces', 'Times New Roman', serif;
+  --font-body: 'Inter', 'Inter Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
 
   font-family: var(--font-body);
-  line-height: 1.5;
-  font-weight: 500;
-  color: var(--ink-strong);
-  background:
-    radial-gradient(circle at top left, rgba(31, 95, 175, 0.14), transparent 28%),
-    radial-gradient(circle at 90% 10%, rgba(247, 148, 29, 0.12), transparent 24%),
-    linear-gradient(180deg, #f6ead7 0%, var(--canvas) 42%, var(--canvas-deep) 100%);
-
+  line-height: 1.55;
+  font-weight: 400;
+  font-feature-settings: 'cv11' 1, 'ss01' 1, 'ss03' 1;
+  color: var(--ink);
+  background-color: var(--canvas);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -31,7 +99,9 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  background: var(--canvas);
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 * {
@@ -42,21 +112,44 @@ body {
   min-width: 320px;
   margin: 0;
   min-height: 100vh;
-  color: var(--ink-strong);
-  background: transparent;
+  max-width: 100%;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% 6%, rgba(164, 114, 81, 0.16), transparent 38%),
+    radial-gradient(circle at 92% 12%, rgba(221, 158, 89, 0.22), transparent 36%),
+    radial-gradient(circle at 88% 90%, rgba(127, 168, 80, 0.16), transparent 36%),
+    radial-gradient(circle at 8% 88%, rgba(221, 158, 89, 0.14), transparent 32%),
+    var(--canvas);
+  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
+/* Subtle dotted texture across the canvas */
 body::before {
   content: '';
   position: fixed;
-  inset: 0;
+  inset: -10%;
   z-index: -2;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
-  background-size: 36px 36px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 92%);
+  background-image: radial-gradient(rgba(74, 45, 26, 0.05) 1px, transparent 1.4px);
+  background-size: 24px 24px;
   pointer-events: none;
+  mask-image: radial-gradient(circle at 50% 35%, black 30%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at 50% 35%, black 30%, transparent 85%);
+}
+
+/* Light grid pattern */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(74, 45, 26, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 45, 26, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(180deg, transparent, black 18%, black 82%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 18%, black 82%, transparent);
 }
 
 a {
@@ -68,13 +161,93 @@ input,
 textarea,
 select {
   font: inherit;
+  color: inherit;
 }
 
 #root {
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 ::selection {
   color: var(--paper);
-  background: rgba(31, 95, 175, 0.78);
+  background: var(--clay);
+}
+
+/* Custom scrollbar — warm */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(164, 114, 81, 0.35);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(164, 114, 81, 0.6);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+* {
+  scrollbar-color: rgba(164, 114, 81, 0.42) transparent;
+  scrollbar-width: thin;
+}
+
+/* Global focus ring */
+:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+button:focus,
+a:focus {
+  outline: none;
+}
+
+/* Skip link */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 999;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  background: var(--clay);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.84rem;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  box-shadow: var(--shadow-glow-clay);
+  transform: translateY(-300%);
+  transition: transform 220ms ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

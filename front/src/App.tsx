@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import CompanyLayout from './components/CompanyLayout'
+import AppShell from './components/AppShell'
+import CommandPalette from './components/CommandPalette'
 import PublicLayout from './components/PublicLayout'
-import WorkspaceLayout from './components/WorkspaceLayout'
+import { pick, useLang, type Lang } from './i18n/LanguageContext'
 import { useDemoPlatform } from './lib/demoPlatform'
 import { useDemoSession } from './lib/demoSession'
 import { routeHref, useHashPath } from './lib/hashRouter'
@@ -29,8 +30,101 @@ import ProjectsPage from './pages/ProjectsPage'
 import StudentAccountPage from './pages/StudentAccountPage'
 import StudentProfilePage from './pages/StudentProfilePage'
 
+const subtitles = {
+  en: {
+    booting: 'Connecting to the marketplace',
+    bootingBody: 'Loading your session and the live brief feed.',
+    bootingEyebrow: 'Booting',
+    marketplace: 'Marketplace',
+    marketplaceSub: 'Browse scoped freelance opportunities with full context, then apply when the fit is sharp.',
+    projectBrief: 'Project brief',
+    projectBriefSub: 'Review scope, deliverables and milestone structure before applying.',
+    studio: 'Studio',
+    studioOverview: 'Studio overview',
+    studioSub: 'Sign in once, then manage projects, applications, milestones, and messages from one workspace.',
+    applications: 'Applications',
+    applicationsSub: 'Track every brief you applied to. Status changes, company replies, and next moves in one queue.',
+    messages: 'Messages',
+    messagesSub: 'Project-linked conversations live here — no scattered email threads.',
+    profile: 'Profile',
+    profileSub: 'Your profile is what companies read first when you apply. Keep it sharp.',
+    companyOs: 'Company OS',
+    companyOsSub: 'Track inventory, applicant flow, and publishing quality across every brief.',
+    projects: 'Projects',
+    projectsSub: 'Manage every brief your company has published or is reviewing.',
+    newBrief: 'New brief',
+    newBriefSub: 'Draft a project brief that reads sharp on the marketplace and holds up under applicant review.',
+    applicants: 'Applicants',
+    applicantsSub: 'Review every candidate in one queue. Filter by project, move them through your pipeline.',
+    companyMessages: 'Messages',
+    companyMessagesSub: 'Reply to candidates and keep all hiring conversation inside the platform.',
+    continueStudio: 'Continue to studio',
+    continueCompanyOs: 'Continue to company OS',
+    continueRequested: 'Continue to requested page',
+    home: 'Home',
+    howItWorks: 'How it works',
+    about: 'About',
+    forStudents: 'For students',
+    forCompanies: 'For companies',
+    accountAccess: 'Account access',
+    studentSignIn: 'Student sign in',
+    createStudent: 'Create student account',
+    companyLogin: 'Company login',
+    createCompany: 'Create company account',
+    companyProjects: 'Company projects',
+    postProject: 'Post project',
+    notFound: 'Not found',
+  },
+  fr: {
+    booting: 'Connexion à la plateforme',
+    bootingBody: 'Chargement de ta session et du fil des mandats.',
+    bootingEyebrow: 'Démarrage',
+    marketplace: 'Projets',
+    marketplaceSub: 'Explore des opportunités freelance bien définies, en contexte complet, puis postule quand ça colle.',
+    projectBrief: 'Mandat',
+    projectBriefSub: 'Lis le scope, les livrables et la structure d’étapes avant de postuler.',
+    studio: 'Atelier',
+    studioOverview: 'Vue d’ensemble',
+    studioSub: 'Connecte-toi une fois, puis gère projets, candidatures, étapes et messages depuis un seul atelier.',
+    applications: 'Candidatures',
+    applicationsSub: 'Suis chaque mandat où tu as postulé. Changements de statut, réponses, prochaines étapes — tout dans une file.',
+    messages: 'Messages',
+    messagesSub: 'Les conversations liées aux projets vivent ici — pas de fils de courriels éparpillés.',
+    profile: 'Profil',
+    profileSub: 'Ton profil, c’est ce que les entreprises lisent en premier. Garde-le aiguisé.',
+    companyOs: 'Espace entreprise',
+    companyOsSub: 'Suivez l’inventaire, le flux de candidatures et la qualité de publication sur chaque mandat.',
+    projects: 'Projets',
+    projectsSub: 'Gérez chaque mandat publié ou en revue par votre entreprise.',
+    newBrief: 'Nouveau mandat',
+    newBriefSub: 'Rédigez un mandat qui lit aiguisé sur la vitrine et tient bon sous la revue des candidats.',
+    applicants: 'Candidats',
+    applicantsSub: 'Examinez chaque candidat dans une seule file. Filtrez par projet, déplacez-les dans votre pipeline.',
+    companyMessages: 'Messages',
+    companyMessagesSub: 'Répondez aux candidats et gardez toute la conversation d’embauche dans la plateforme.',
+    continueStudio: 'Continuer vers l’atelier',
+    continueCompanyOs: 'Continuer vers l’espace entreprise',
+    continueRequested: 'Continuer vers la page demandée',
+    home: 'Accueil',
+    howItWorks: 'Comment ça marche',
+    about: 'À propos',
+    forStudents: 'Pour les étudiants',
+    forCompanies: 'Pour les entreprises',
+    accountAccess: 'Accès au compte',
+    studentSignIn: 'Connexion étudiant',
+    createStudent: 'Créer un compte étudiant',
+    companyLogin: 'Connexion entreprise',
+    createCompany: 'Créer un compte entreprise',
+    companyProjects: 'Projets entreprise',
+    postProject: 'Publier un mandat',
+    notFound: 'Page introuvable',
+  },
+}
+
 function App() {
   const currentPath = useHashPath()
+  const lang = useLang()
+  const t = subtitles[lang]
   const { session, status, signInCompany, createCompanyAccount, signInMember, createMemberAccount, signOut } =
     useDemoSession()
   const {
@@ -48,10 +142,14 @@ function App() {
     submitMessageReply,
     updateStudentProfileRemote,
   } = useDemoPlatform(session, status)
+
   const [memberAuthTarget, setMemberAuthTarget] = useState('/dashboard')
   const [companyAuthTarget, setCompanyAuthTarget] = useState('/company/dashboard')
+  const [paletteOpen, setPaletteOpen] = useState(false)
+
   const memberSession = session?.role === 'member' ? session : null
   const companySession = session?.role === 'company' ? session : null
+
   const isPublicProjectsRoute = currentPath === '/projects' || currentPath.startsWith('/projects/')
   const isAuthRoute = currentPath === '/auth' || currentPath === '/sign-in' || currentPath === '/access'
   const isStudentInfoRoute = currentPath === '/students' || currentPath === '/for-students'
@@ -83,25 +181,47 @@ function App() {
     currentPath === '/company/messages'
 
   const visibleCompanyProjects = companySession ? getCompanyProjectsForSession(companySession) : []
-  const pageTitle = getPageTitle(currentPath, (slug) => getProjectBySlug(slug)?.title)
+  const pageTitle = getPageTitle(currentPath, lang, (slug) => {
+    const p = getProjectBySlug(slug)
+    return p ? pick(p.title, lang) : undefined
+  })
 
   useEffect(() => {
-    document.title = `${pageTitle} | Clee`
+    document.title = `${pageTitle} · Legend`
   }, [pageTitle])
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setPaletteOpen((prev) => !prev)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   if (status === 'loading') {
     return (
-      <PublicLayout currentPath={currentPath} onSignOut={() => undefined} session={null}>
+      <PublicLayout
+        currentPath={currentPath}
+        onOpenPalette={() => setPaletteOpen(true)}
+        onSignOut={() => undefined}
+        session={null}
+      >
         <section className="section-block">
           <article className="panel-card">
-            <p className="eyebrow">Loading</p>
-            <h2>Checking your account session.</h2>
-            <p>The website is loading your sign-in state before opening the right workspace.</p>
+            <p className="eyebrow">{t.bootingEyebrow}</p>
+            <h2>{t.booting}</h2>
+            <p>{t.bootingBody}</p>
           </article>
         </section>
       </PublicLayout>
     )
   }
+
+  const openPalette = () => setPaletteOpen(true)
+  const closePalette = () => setPaletteOpen(false)
 
   const openMemberLogin = (nextPath = '/dashboard') => {
     setMemberAuthTarget(nextPath)
@@ -150,80 +270,65 @@ function App() {
     void handleSignOut()
   }
 
+  const renderInPublic = (children: React.ReactNode, path = currentPath) => (
+    <PublicLayout
+      currentPath={path}
+      onOpenPalette={openPalette}
+      onSignOut={triggerSignOut}
+      session={session}
+    >
+      {children}
+    </PublicLayout>
+  )
+
+  let body: React.ReactNode = null
+
   if (currentPath === '/') {
-    return (
-      <PublicLayout currentPath={currentPath} onSignOut={triggerSignOut} session={session}>
-        <HomePage companyProjects={companyProjects} session={session} studentProjects={studentProjects} />
-      </PublicLayout>
+    body = renderInPublic(
+      <HomePage
+        companyProjects={companyProjects}
+        onOpenPalette={openPalette}
+        session={session}
+        studentProjects={studentProjects}
+      />,
     )
-  }
-
-  if (currentPath === '/about') {
-    return (
-      <PublicLayout currentPath={currentPath} onSignOut={triggerSignOut} session={session}>
-        <AboutPage />
-      </PublicLayout>
-    )
-  }
-
-  if (currentPath === '/how-it-works') {
-    return (
-      <PublicLayout currentPath={currentPath} onSignOut={triggerSignOut} session={session}>
-        <HowItWorksPage />
-      </PublicLayout>
-    )
-  }
-
-  if (isStudentInfoRoute) {
-    return (
-      <PublicLayout currentPath="/students" onSignOut={triggerSignOut} session={session}>
-        <ForStudentsPage session={session} />
-      </PublicLayout>
-    )
-  }
-
-  if (isCompanyInfoRoute) {
-    return (
-      <PublicLayout currentPath="/companies" onSignOut={triggerSignOut} session={session}>
-        <ForCompaniesPage />
-      </PublicLayout>
-    )
-  }
-
-  if (isAuthRoute) {
-    return (
-      <PublicLayout currentPath="/auth" onSignOut={triggerSignOut} session={session}>
-        <AuthPage session={session} />
-      </PublicLayout>
-    )
-  }
-
-  if (isPublicProjectsRoute) {
+  } else if (currentPath === '/about') {
+    body = renderInPublic(<AboutPage />)
+  } else if (currentPath === '/how-it-works') {
+    body = renderInPublic(<HowItWorksPage />)
+  } else if (isStudentInfoRoute) {
+    body = renderInPublic(<ForStudentsPage session={session} />, '/students')
+  } else if (isCompanyInfoRoute) {
+    body = renderInPublic(<ForCompaniesPage />, '/companies')
+  } else if (isAuthRoute) {
+    body = renderInPublic(<AuthPage session={session} />, '/auth')
+  } else if (isPublicProjectsRoute) {
     if (memberSession && currentPath === '/projects') {
-      return (
-        <WorkspaceLayout
+      body = (
+        <AppShell
           currentPath={currentPath}
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={memberSession}
-          subtitle="Browse scoped freelance opportunities with clearer fit, budget, and delivery context."
-          title="Open projects"
+          subtitle={t.marketplaceSub}
+          title={t.marketplace}
+          variant="student"
         >
           <ProjectsPage projects={studentProjects} />
-        </WorkspaceLayout>
+        </AppShell>
       )
-    }
-
-    if (memberSession && currentPath.startsWith('/projects/')) {
+    } else if (memberSession && currentPath.startsWith('/projects/')) {
       const slug = currentPath.replace('/projects/', '')
       const project = getProjectBySlug(slug)
-
-      return (
-        <WorkspaceLayout
+      body = (
+        <AppShell
           currentPath={currentPath}
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={memberSession}
-          subtitle="Review scope, company context, deliverables, and milestone structure before applying."
-          title="Project details"
+          subtitle={t.projectBriefSub}
+          title={project ? pick(project.title, lang) : t.projectBrief}
+          variant="student"
         >
           <ProjectDetailsPage
             hasApplied={project ? hasApplied(project.slug) : false}
@@ -235,83 +340,57 @@ function App() {
             project={project}
             session={memberSession}
           />
-        </WorkspaceLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/projects') {
-      return (
-        <PublicLayout currentPath={currentPath} onSignOut={triggerSignOut} session={session}>
-          <ProjectsPage projects={studentProjects} />
-        </PublicLayout>
-      )
-    }
-
-    if (currentPath.startsWith('/projects/')) {
+    } else if (currentPath === '/projects') {
+      body = renderInPublic(<ProjectsPage projects={studentProjects} />)
+    } else if (currentPath.startsWith('/projects/')) {
       const slug = currentPath.replace('/projects/', '')
       const project = getProjectBySlug(slug)
-
-      return (
-        <PublicLayout currentPath={currentPath} onSignOut={triggerSignOut} session={session}>
-          <ProjectDetailsPage
-            hasApplied={project ? hasApplied(project.slug) : false}
-            onRequestSignIn={() => openMemberLogin(currentPath)}
-            project={project}
-          />
-        </PublicLayout>
+      body = renderInPublic(
+        <ProjectDetailsPage
+          hasApplied={project ? hasApplied(project.slug) : false}
+          onRequestSignIn={() => openMemberLogin(currentPath)}
+          project={project}
+        />,
       )
     }
-  }
-
-  if (isStudentLoginRoute) {
-    return (
-      <PublicLayout currentPath="/students/sign-in" onSignOut={triggerSignOut} session={session}>
-        <LoginPage actionLabel="Continue to student workspace" onSignIn={completeMemberSignIn} />
-      </PublicLayout>
+  } else if (isStudentLoginRoute) {
+    body = renderInPublic(
+      <LoginPage actionLabel={t.continueStudio} onSignIn={completeMemberSignIn} />,
+      '/students/sign-in',
     )
-  }
-
-  if (isStudentCreateRoute) {
-    return (
-      <PublicLayout currentPath="/students/create-account" onSignOut={triggerSignOut} session={session}>
-        <StudentAccountPage onCreateAccount={completeMemberAccountCreate} />
-      </PublicLayout>
+  } else if (isStudentCreateRoute) {
+    body = renderInPublic(
+      <StudentAccountPage onCreateAccount={completeMemberAccountCreate} />,
+      '/students/create-account',
     )
-  }
-
-  if (isCompanyLoginRoute) {
-    return (
-      <PublicLayout currentPath="/companies/sign-in" onSignOut={triggerSignOut} session={session}>
-        <CompanyLoginPage actionLabel="Continue to company workspace" onSignIn={completeCompanySignIn} />
-      </PublicLayout>
+  } else if (isCompanyLoginRoute) {
+    body = renderInPublic(
+      <CompanyLoginPage actionLabel={t.continueCompanyOs} onSignIn={completeCompanySignIn} />,
+      '/companies/sign-in',
     )
-  }
-
-  if (isCompanyCreateRoute) {
-    return (
-      <PublicLayout currentPath="/companies/create-account" onSignOut={triggerSignOut} session={session}>
-        <CompanyAccountPage onCreateAccount={completeCompanyAccountCreate} />
-      </PublicLayout>
+  } else if (isCompanyCreateRoute) {
+    body = renderInPublic(
+      <CompanyAccountPage onCreateAccount={completeCompanyAccountCreate} />,
+      '/companies/create-account',
     )
-  }
-
-  if (isMemberRoute) {
+  } else if (isMemberRoute) {
     if (!memberSession) {
-      return (
-        <PublicLayout currentPath="/students/sign-in" onSignOut={triggerSignOut} session={session}>
-          <LoginPage actionLabel="Continue to requested page" onSignIn={(payload) => completeMemberSignIn(payload, currentPath)} />
-        </PublicLayout>
+      body = renderInPublic(
+        <LoginPage actionLabel={t.continueRequested} onSignIn={(payload) => completeMemberSignIn(payload, currentPath)} />,
+        '/students/sign-in',
       )
-    }
-
-    if (currentPath === '/dashboard' || currentPath === '/student/dashboard') {
-      return (
-        <WorkspaceLayout
+    } else if (currentPath === '/dashboard' || currentPath === '/student/dashboard') {
+      body = (
+        <AppShell
           currentPath="/dashboard"
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={memberSession}
-          subtitle="Sign in once, then manage projects, applications, milestones, and messages from one place."
-          title="Your dashboard"
+          subtitle={t.studioSub}
+          title={t.studioOverview}
+          variant="student"
         >
           <DashboardPage
             applications={applicationsWithProjects}
@@ -319,229 +398,174 @@ function App() {
             projects={studentProjects}
             session={memberSession}
           />
-        </WorkspaceLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/applications' || currentPath === '/student/applications') {
-      return (
-        <WorkspaceLayout
+    } else if (currentPath === '/applications' || currentPath === '/student/applications') {
+      body = (
+        <AppShell
           currentPath="/applications"
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={memberSession}
-          subtitle="Track every application, see what changed, and understand what companies want next."
-          title="Your applications"
+          subtitle={t.applicationsSub}
+          title={t.applications}
+          variant="student"
         >
           <ApplicationsPage applications={applicationsWithProjects} />
-        </WorkspaceLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/messages' || currentPath === '/student/messages') {
-      return (
-        <WorkspaceLayout
+    } else if (currentPath === '/messages' || currentPath === '/student/messages') {
+      body = (
+        <AppShell
           currentPath="/messages"
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={memberSession}
-          subtitle="Keep project-linked conversations inside the platform instead of scattering them across email."
-          title="Messages"
+          subtitle={t.messagesSub}
+          title={t.messages}
+          variant="student"
         >
           <MessagesPage messages={messagesWithProjects} onReply={submitMessageReply} />
-        </WorkspaceLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/profile') {
-      return (
-        <WorkspaceLayout
+    } else if (currentPath === '/profile') {
+      body = (
+        <AppShell
           currentPath="/profile"
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={memberSession}
-          subtitle="Your profile is visible to verified companies when you apply. Keep it accurate to improve match quality."
-          title="Your profile"
+          subtitle={t.profileSub}
+          title={t.profile}
+          variant="student"
         >
           <StudentProfilePage onSave={updateStudentProfileRemote} session={memberSession} />
-        </WorkspaceLayout>
+        </AppShell>
       )
     }
-  }
-
-  if (isCompanyRoute) {
+  } else if (isCompanyRoute) {
     if (!companySession) {
-      return (
-        <PublicLayout currentPath="/companies/sign-in" onSignOut={triggerSignOut} session={session}>
-          <CompanyLoginPage actionLabel="Continue to requested page" onSignIn={(payload) => completeCompanySignIn(payload, currentPath)} />
-        </PublicLayout>
+      body = renderInPublic(
+        <CompanyLoginPage actionLabel={t.continueRequested} onSignIn={(payload) => completeCompanySignIn(payload, currentPath)} />,
+        '/companies/sign-in',
       )
-    }
-
-    if (currentPath === '/company/dashboard') {
-      return (
-        <CompanyLayout
+    } else if (currentPath === '/company/dashboard') {
+      body = (
+        <AppShell
           currentPath={currentPath}
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={companySession}
-          subtitle="Track company profile health, live project inventory, applicant flow, and publishing quality."
-          title="Company dashboard"
+          subtitle={t.companyOsSub}
+          title={t.companyOs}
+          variant="company"
         >
           <CompanyDashboardPage projects={visibleCompanyProjects} session={companySession} />
-        </CompanyLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/company/projects') {
-      return (
-        <CompanyLayout
+    } else if (currentPath === '/company/projects') {
+      body = (
+        <AppShell
           currentPath={currentPath}
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={companySession}
-          subtitle="Manage every project your company has published or is actively reviewing."
-          title="Company projects"
+          subtitle={t.projectsSub}
+          title={t.projects}
+          variant="company"
         >
           <CompanyProjectsPage projects={visibleCompanyProjects} />
-        </CompanyLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/company/post-project') {
-      return (
-        <CompanyLayout
+    } else if (currentPath === '/company/post-project') {
+      body = (
+        <AppShell
           currentPath={currentPath}
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={companySession}
-          subtitle="Draft a project brief that reads clearly on the website and holds up during applicant review."
-          title="Post a project"
+          subtitle={t.newBriefSub}
+          title={t.newBrief}
+          variant="company"
         >
           <CompanyPostProjectPage
             onPostProject={(draft) => postCompanyProject(draft, companySession)}
             session={companySession}
           />
-        </CompanyLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/company/applicants') {
-      return (
-        <CompanyLayout
+    } else if (currentPath === '/company/applicants') {
+      body = (
+        <AppShell
           currentPath={currentPath}
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={companySession}
-          subtitle="Review every candidate in one queue. Filter by project and move them through your pipeline."
-          title="Applicants"
+          subtitle={t.applicantsSub}
+          title={t.applicants}
+          variant="company"
         >
           <CompanyApplicantsPage applicants={companyApplicants} projects={visibleCompanyProjects} />
-        </CompanyLayout>
+        </AppShell>
       )
-    }
-
-    if (currentPath === '/company/messages') {
-      return (
-        <CompanyLayout
+    } else if (currentPath === '/company/messages') {
+      body = (
+        <AppShell
           currentPath={currentPath}
+          onOpenPalette={openPalette}
           onSignOut={triggerSignOut}
           session={companySession}
-          subtitle="Reply to candidates, share project context, and keep all hiring conversations inside the platform."
-          title="Messages"
+          subtitle={t.companyMessagesSub}
+          title={t.companyMessages}
+          variant="company"
         >
           <CompanyMessagesPage messages={companyMessages} projects={visibleCompanyProjects} session={companySession} />
-        </CompanyLayout>
+        </AppShell>
       )
     }
+  }
+
+  if (!body) {
+    body = renderInPublic(<NotFoundPage />)
   }
 
   return (
-    <PublicLayout currentPath={currentPath} onSignOut={triggerSignOut} session={session}>
-      <NotFoundPage />
-    </PublicLayout>
+    <>
+      {body}
+      <CommandPalette
+        onClose={closePalette}
+        onSignOut={triggerSignOut}
+        open={paletteOpen}
+        session={session}
+      />
+    </>
   )
 }
 
-function getPageTitle(path: string, resolveProjectTitle: (slug: string) => string | undefined) {
-  if (path === '/') {
-    return 'Home'
-  }
-
-  if (path === '/how-it-works') {
-    return 'How It Works'
-  }
-
-  if (path === '/about') {
-    return 'About'
-  }
-
-  if (path === '/students' || path === '/for-students') {
-    return 'For Students'
-  }
-
-  if (path === '/for-companies' || path === '/companies') {
-    return 'For Companies'
-  }
-
-  if (path === '/auth' || path === '/sign-in' || path === '/access') {
-    return 'Account Access'
-  }
-
-  if (path === '/projects') {
-    return 'Projects'
-  }
-
-  if (path === '/login' || path === '/students/sign-in') {
-    return 'Student Sign In'
-  }
-
-  if (path === '/create-account' || path === '/students/create-account') {
-    return 'Create Student Account'
-  }
-
-  if (path === '/company/login' || path === '/companies/sign-in') {
-    return 'Company Login'
-  }
-
-  if (path === '/company/create-account' || path === '/companies/create-account') {
-    return 'Create Company Account'
-  }
-
-  if (path === '/company/dashboard') {
-    return 'Company Dashboard'
-  }
-
-  if (path === '/company/projects') {
-    return 'Company Projects'
-  }
-
-  if (path === '/company/post-project') {
-    return 'Post Project'
-  }
-
-  if (path === '/dashboard' || path === '/student/dashboard') {
-    return 'Dashboard'
-  }
-
-  if (path.startsWith('/projects/')) {
-    return resolveProjectTitle(path.replace('/projects/', '')) ?? 'Project Details'
-  }
-
-  if (path === '/applications' || path === '/student/applications') {
-    return 'Applications'
-  }
-
-  if (path === '/messages' || path === '/student/messages') {
-    return 'Messages'
-  }
-
-  if (path === '/profile') {
-    return 'Your Profile'
-  }
-
-  if (path === '/company/applicants') {
-    return 'Applicants'
-  }
-
-  if (path === '/company/messages') {
-    return 'Company Messages'
-  }
-
-  return 'Page Not Found'
+function getPageTitle(path: string, lang: Lang, resolveProjectTitle: (slug: string) => string | undefined) {
+  const tt = subtitles[lang]
+  if (path === '/') return tt.home
+  if (path === '/how-it-works') return tt.howItWorks
+  if (path === '/about') return tt.about
+  if (path === '/students' || path === '/for-students') return tt.forStudents
+  if (path === '/for-companies' || path === '/companies') return tt.forCompanies
+  if (path === '/auth' || path === '/sign-in' || path === '/access') return tt.accountAccess
+  if (path === '/projects') return tt.marketplace
+  if (path === '/login' || path === '/students/sign-in') return tt.studentSignIn
+  if (path === '/create-account' || path === '/students/create-account') return tt.createStudent
+  if (path === '/company/login' || path === '/companies/sign-in') return tt.companyLogin
+  if (path === '/company/create-account' || path === '/companies/create-account') return tt.createCompany
+  if (path === '/company/dashboard') return tt.companyOs
+  if (path === '/company/projects') return tt.companyProjects
+  if (path === '/company/post-project') return tt.postProject
+  if (path === '/dashboard' || path === '/student/dashboard') return tt.studio
+  if (path.startsWith('/projects/')) return resolveProjectTitle(path.replace('/projects/', '')) ?? tt.projectBrief
+  if (path === '/applications' || path === '/student/applications') return tt.applications
+  if (path === '/messages' || path === '/student/messages') return tt.messages
+  if (path === '/profile') return tt.profile
+  if (path === '/company/applicants') return tt.applicants
+  if (path === '/company/messages') return tt.companyMessages
+  return tt.notFound
 }
 
 export default App

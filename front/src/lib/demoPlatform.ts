@@ -7,6 +7,7 @@ import {
   type StudentMessage,
   type StudentProject,
 } from '../data/studentPortal'
+import { pick } from '../i18n/LanguageContext'
 import {
   applyToProject,
   createProject,
@@ -117,7 +118,7 @@ export function useDemoPlatform(session: DemoSession, authStatus: 'loading' | 'r
       const result = await applyToProject(project.slug, {
         companyName: project.company,
         note,
-        projectTitle: project.title,
+        projectTitle: pick(project.title, 'en'),
       })
 
       await refreshStudentData()

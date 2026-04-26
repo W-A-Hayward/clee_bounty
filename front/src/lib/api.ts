@@ -53,6 +53,7 @@ export type ProfileUpdate = {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
+const requestTimeoutMs = 5000
 
 export async function fetchSession() {
   return request<{ ok: true; session: DemoSession }>('/api/session')
@@ -158,6 +159,9 @@ async function request<T>(
     body?: JsonRequestBody
   } = {},
 ): Promise<T> {
+  const controller = new AbortController()
+  const timeoutId = window.setTimeout(() => controller.abort(), requestTimeoutMs)
+
   const response = await fetch(`${apiBaseUrl}${path}`, {
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: 'include',
@@ -165,7 +169,16 @@ async function request<T>(
       'Content-Type': 'application/json',
     },
     method: options.method ?? 'GET',
+    signal: controller.signal,
   })
+    .catch((error: unknown) => {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw new ApiError(408, 'The API took too long to respond.')
+      }
+
+      throw error
+    })
+    .finally(() => window.clearTimeout(timeoutId))
 
   const payload = (await response.json().catch(() => null)) as { error?: string } | null
 

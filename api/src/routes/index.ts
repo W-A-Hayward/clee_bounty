@@ -1,4 +1,5 @@
 import { Router } from "express";
+import demoRoutes from "./demo.routes.ts";
 import authRoutes from "./auth.routes.ts";
 import companyRoutes from "./company.routes.ts";
 import postingRoutes from "./posting.routes.ts";
@@ -9,6 +10,7 @@ import notificationRoutes from "./notification.routes.ts";
 
 const router = Router();
 
+router.use("/", demoRoutes);
 router.use("/auth", authRoutes);
 router.use("/company", companyRoutes);
 router.use("/posting", postingRoutes);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { companyProfile } from '../data/companyPortal'
 import { studentProfile } from '../data/studentPortal'
+import { pick } from '../i18n/LanguageContext'
 import {
   fetchSession,
   loginCompany,
@@ -94,9 +95,9 @@ export function useDemoSession() {
   const signInMember = async (payload: MemberAuthPayload, nextPath = '/dashboard') => {
     const result = await loginStudent({
       ...payload,
-      availability: payload.availability ?? studentProfile.availability,
+      availability: payload.availability ?? pick(studentProfile.availability, 'en'),
       portfolioUrl: payload.portfolioUrl ?? studentProfile.portfolioUrl,
-      program: payload.program ?? studentProfile.program,
+      program: payload.program ?? pick(studentProfile.program, 'en'),
       rate: payload.rate ?? studentProfile.rate,
       school: payload.school ?? studentProfile.school,
     })
@@ -108,9 +109,9 @@ export function useDemoSession() {
   const createMemberAccount = async (payload: MemberAuthPayload, nextPath = '/dashboard') => {
     const result = await registerStudent({
       ...payload,
-      availability: payload.availability ?? studentProfile.availability,
+      availability: payload.availability ?? pick(studentProfile.availability, 'en'),
       portfolioUrl: payload.portfolioUrl ?? studentProfile.portfolioUrl,
-      program: payload.program ?? studentProfile.program,
+      program: payload.program ?? pick(studentProfile.program, 'en'),
       rate: payload.rate ?? studentProfile.rate,
       school: payload.school ?? studentProfile.school,
     })
@@ -122,10 +123,10 @@ export function useDemoSession() {
   const signInCompany = async (payload: CompanyAuthPayload, nextPath = '/company/dashboard') => {
     const result = await loginCompany({
       ...payload,
-      description: payload.description ?? companyProfile.description,
-      industry: payload.industry ?? companyProfile.industry,
-      location: payload.location ?? companyProfile.location,
-      teamSize: payload.teamSize ?? companyProfile.teamSize,
+      description: payload.description ?? pick(companyProfile.description, 'en'),
+      industry: payload.industry ?? pick(companyProfile.industry, 'en'),
+      location: payload.location ?? pick(companyProfile.location, 'en'),
+      teamSize: payload.teamSize ?? pick(companyProfile.teamSize, 'en'),
       website: payload.website ?? companyProfile.website,
     })
 
@@ -139,10 +140,10 @@ export function useDemoSession() {
   ) => {
     const result = await registerCompany({
       ...payload,
-      description: payload.description ?? companyProfile.description,
-      industry: payload.industry ?? companyProfile.industry,
-      location: payload.location ?? companyProfile.location,
-      teamSize: payload.teamSize ?? companyProfile.teamSize,
+      description: payload.description ?? pick(companyProfile.description, 'en'),
+      industry: payload.industry ?? pick(companyProfile.industry, 'en'),
+      location: payload.location ?? pick(companyProfile.location, 'en'),
+      teamSize: payload.teamSize ?? pick(companyProfile.teamSize, 'en'),
       website: payload.website ?? companyProfile.website,
     })
 
